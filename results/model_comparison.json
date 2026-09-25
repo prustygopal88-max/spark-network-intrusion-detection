@@ -1,0 +1,56 @@
+[
+    {
+        "model_name": "Logistic Regression",
+        "accuracy": 0.99,
+        "precision": 0.9835,
+        "recall": 0.9934,
+        "f1_score": 0.9884,
+        "roc_auc": 0.9975,
+        "confusion_matrix": {
+            "tn": 24030,
+            "fp": 304,
+            "fn": 120,
+            "tp": 18128
+        },
+        "total_test_samples": 42582,
+        "confusion_matrix_plot": "C:\\Users\\prust\\OneDrive\\Desktop\\spark-network-intrusion-detection\\results\\figures\\logistic_regression_cm.png",
+        "train_time_sec": 11.94,
+        "inference_time_sec": 1.4
+    },
+    {
+        "model_name": "Random Forest",
+        "accuracy": 0.9999,
+        "precision": 1.0,
+        "recall": 0.9998,
+        "f1_score": 0.9999,
+        "roc_auc": 1.0,
+        "confusion_matrix": {
+            "tn": 24334,
+            "fp": 0,
+            "fn": 4,
+            "tp": 18244
+        },
+        "total_test_samples": 42582,
+        "confusion_matrix_plot": "C:\\Users\\prust\\OneDrive\\Desktop\\spark-network-intrusion-detection\\results\\figures\\random_forest_cm.png",
+        "train_time_sec": 7.01,
+        "inference_time_sec": 1.23
+    },
+    {
+        "model_name": "Gradient-Boosted Trees",
+        "accuracy": 0.9996,
+        "precision": 0.9995,
+        "recall": 0.9996,
+        "f1_score": 0.9995,
+        "roc_auc": 0.9999,
+        "confusion_matrix": {
+            "tn": 24324,
+            "fp": 10,
+            "fn": 8,
+            "tp": 18240
+        },
+        "total_test_samples": 42582,
+        "confusion_matrix_plot": "C:\\Users\\prust\\OneDrive\\Desktop\\spark-network-intrusion-detection\\results\\figures\\gradient-boosted_trees_cm.png",
+        "train_time_sec": 31.66,
+        "inference_time_sec": 0.88
+    }
+]

@@ -1,0 +1,37 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Spark local logs and temporary warehouse
+metastore_db/
+derby.log
+warehouse/
+spark-warehouse/
+*.log
+
+# Environments
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Large datasets and generated data
+data/raw/
+data/processed/
+!data/processed/demo_batch_sample.csv
+
+# Hadoop / Spark generated files
+hadoop/
+
+# OS files
+.DS_Store
+Thumbs.db

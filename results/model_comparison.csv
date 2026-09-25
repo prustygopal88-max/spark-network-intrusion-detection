@@ -1,0 +1,4 @@
+Model,Accuracy (%),Precision (%),Recall (%),F1-Score (%),ROC-AUC,Train Time (s),Inference Time (s),True Negatives,False Positives,False Negatives,True Positives
+Logistic Regression,99.0,98.35,99.34,98.84,0.9975,11.94,1.4,24030,304,120,18128
+Random Forest,99.99,100.0,99.98,99.99,1.0,7.01,1.23,24334,0,4,18244
+Gradient-Boosted Trees,99.96,99.95,99.96,99.95,0.9999,31.66,0.88,24324,10,8,18240
