@@ -192,6 +192,46 @@ Open your browser and navigate to: **`http://localhost:8501`**
   - Review traffic distributions, threat scores, and click **"💾 Download Predictions as CSV"** to save results.
 - **ℹ️ About Project:** Full architecture documentation and academic references.
 
+## 📸 Project Screenshots
+
+### 1. Dashboard & Overview
+
+The main dashboard provides an overview of the network intrusion detection system, including the number of raw network flows, cleaned records, engineered features, model accuracy, and dataset class distribution.
+
+![Dashboard](screenshots/dashboard.png)
+
+---
+
+### 2. Model Performance
+
+This section compares the three PySpark MLlib models used in the project: Logistic Regression, Random Forest, and Gradient-Boosted Trees. It includes accuracy, precision, recall, F1-score, ROC-AUC, training time, inference time, and confusion matrix analysis.
+
+![Model Performance](screenshots/model_performance.png)
+
+---
+
+### 3. Single Flow Prediction
+
+The Single Flow Prediction module allows a user to select a PySpark MLlib model, provide network-flow attributes, and classify an individual network flow as BENIGN or PORTSCAN.
+
+![Single Flow Prediction](screenshots/single_prediction.png)
+
+---
+
+### 4. Batch Network Traffic Classification
+
+The Batch Prediction module allows users to upload a CICIDS2017-format CSV file or use the provided demo dataset containing 1,000 network flows.
+
+![Batch Prediction](screenshots/batch_prediction.png)
+
+---
+
+### 5. Batch Classification Results
+
+After batch processing, the system displays the number of analyzed flows, benign flows, detected PortScan intrusions, the selected model, prediction results, threat scores, confidence values, and allows the predictions to be downloaded as a CSV file.
+
+![Batch Classification Results](screenshots/batch_results.png)
+
 ### 3. Run Automated Tests
 To run the automated verification suite:
 ```bash
