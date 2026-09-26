@@ -381,3 +381,10 @@ This executes **6 end-to-end tests** (`tests/test_end_to_end.py`). A separate Sp
 1. **Multi-Class Expansion** — Incorporate additional partitions from CICIDS2017 (DDoS, Botnet, Web Attacks) into a unified multi-class classifier.
 2. **Spark Structured Streaming** — Ingest real-time packet capture streams via Apache Kafka into a Spark Structured Streaming window for live intrusion alerting.
 3. **Unsupervised Anomaly Detection** — Deploy Spark MLlib Isolation Forests or Autoencoders for zero-day threat discovery.
+
+
+
+
+## 🤝 Contributors
+
+* **[Vivek Jaiswal](https://github.com/vivekkash2125-star)** - Project Contributor
