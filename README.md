@@ -386,5 +386,6 @@ This executes **6 end-to-end tests** (`tests/test_end_to_end.py`). A separate Sp
 
 
 ## 🤝 Contributors
-
+* **[Gopal Prusty](https://github.com/prustygopal88-max)** - Project Contributor
 * **[Vivek Jaiswal](https://github.com/vivekkash2125-star)** - Project Contributor
+* **[Nidhi Chougule](https://github.com/nidhichougule)** - Project Contributor
