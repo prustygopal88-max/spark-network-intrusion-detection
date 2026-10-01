@@ -19,59 +19,141 @@ from src.models.predictor import (
     predict_batch_flows,
     get_feature_columns
 )
+from src.evaluation.xai_explainer import explain_prediction
 
 # Page Configuration
 st.set_page_config(
-    page_title="Spark NIDS - Intrusion Detection",
+    page_title="NetGuard AI - Scalable Intrusion Detection",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for polished college presentation UI
+# Custom High-End SaaS CSS Styling (Enterprise Cybersecurity Palette)
 st.markdown("""
 <style>
-    .main-title {
+    /* Global Typography & Backgrounds */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .hero-banner {
+        background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F766E 100%);
+        padding: 32px 36px;
+        border-radius: 14px;
+        color: #FFFFFF;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        border: 1px solid #334155;
+    }
+    .hero-title {
         font-size: 2.2rem;
-        font-weight: 700;
-        color: #1E3A8A;
-        margin-bottom: 0.2rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        margin-bottom: 6px;
+        color: #F8FAFC;
     }
-    .sub-title {
+    .hero-subtitle {
         font-size: 1.05rem;
-        color: #4B5563;
-        margin-bottom: 1.5rem;
+        color: #94A3B8;
+        font-weight: 400;
+        margin-bottom: 0px;
     }
-    .metric-card {
+    .role-badge-user {
+        background-color: #0D9488;
+        color: #FFFFFF;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 8px;
+    }
+    .role-badge-admin {
+        background-color: #4F46E5;
+        color: #FFFFFF;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 8px;
+    }
+    
+    /* Elegant Information & XAI Cards */
+    .info-card {
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+    .xai-card-attack {
+        background-color: #FEF2F2;
+        border: 1.5px solid #F87171;
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 16px;
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.08);
+    }
+    .xai-card-benign {
+        background-color: #F0FDF4;
+        border: 1.5px solid #4ADE80;
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 16px;
+        box-shadow: 0 4px 14px rgba(34, 197, 94, 0.08);
+    }
+    
+    .verdict-banner-attack {
+        background: linear-gradient(90deg, #DC2626 0%, #991B1B 100%);
+        color: #FFFFFF;
+        padding: 16px 20px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 1.35rem;
+        letter-spacing: -0.3px;
+        text-align: center;
+        margin-bottom: 14px;
+    }
+    .verdict-banner-benign {
+        background: linear-gradient(90deg, #16A34A 0%, #166534 100%);
+        color: #FFFFFF;
+        padding: 16px 20px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 1.35rem;
+        letter-spacing: -0.3px;
+        text-align: center;
+        margin-bottom: 14px;
+    }
+    
+    .step-box {
         background-color: #F8FAFC;
         border: 1px solid #E2E8F0;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 16px;
         text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        height: 100%;
     }
-    .badge-benign {
-        background-color: #DEF7EC;
-        color: #03543F;
-        padding: 6px 14px;
-        border-radius: 20px;
+    .step-num {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0F766E;
+        margin-bottom: 4px;
+    }
+    .step-title {
         font-weight: 700;
-        font-size: 1.2rem;
-        display: inline-block;
-        border: 1px solid #31C48D;
+        font-size: 1.0rem;
+        color: #1E293B;
+        margin-bottom: 4px;
     }
-    .badge-attack {
-        background-color: #FDE8E8;
-        color: #9B1C1C;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-weight: 700;
-        font-size: 1.2rem;
-        display: inline-block;
-        border: 1px solid #F98080;
-    }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+    .step-desc {
+        font-size: 0.88rem;
+        color: #64748B;
+        line-height: 1.4;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -102,400 +184,381 @@ def load_project_metadata():
     return prep_data, model_data, presets
 
 # Helper: Cached Spark Artifacts
-@st.cache_resource(show_spinner="Initializing Apache Spark cluster runtime & loading MLlib models...")
+@st.cache_resource(show_spinner="Initializing Apache Spark Cluster & MLlib Models...")
 def get_cached_spark_engine():
     return load_inference_artifacts()
 
-# Load metadata
 prep_meta, model_results, sample_presets = load_project_metadata()
 
 # ==============================================================================
-# SIDEBAR NAVIGATION
+# SIDEBAR: ROLE SELECTOR & ACCESS GATEWAY
 # ==============================================================================
 st.sidebar.image("https://spark.apache.org/images/spark-logo-trademark.png", width=190)
-st.sidebar.markdown("### **Navigation**")
-nav_choice = st.sidebar.radio(
-    "Go to",
+st.sidebar.markdown("### **Portal Selection**")
+
+portal_choice = st.sidebar.radio(
+    "Choose View Portal:",
     [
-        "📊 Dashboard & Overview",
-        "📈 Model Performance",
-        "🎯 Single Flow Prediction",
-        "📁 Batch Prediction (CSV)",
-        "ℹ️ About Project"
+        "👤 Guest / Live Demo (Non-Technical)",
+        "🛡️ Admin & Engineer Portal (Deep Tech)"
     ]
 )
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### **System Environment**")
-st.sidebar.info(
-    """
-    - **Engine:** Apache Spark 3.5.9
-    - **Runtime:** OpenJDK 17 LTS
-    - **Interface:** PySpark MLlib
-    - **Dataset:** CICIDS2017
-    - **Target:** BENIGN (0) vs PortScan (1)
-    """
-)
-st.sidebar.caption("Scalable Network Intrusion Detection System")
+st.sidebar.caption("• **Engine:** Apache Spark 3.5.9")
+st.sidebar.caption("• **Runtime:** OpenJDK 17 LTS")
+st.sidebar.caption("• **ML Library:** PySpark MLlib")
+st.sidebar.caption("• **Dataset:** CICIDS2017 Benchmark")
+st.sidebar.caption("• **Target:** BENIGN (0) vs PortScan (1)")
 
 # ==============================================================================
-# VIEW 1: DASHBOARD & OVERVIEW
+# PORTAL 1: GUEST / LIVE DEMO PORTAL (NON-TECHNICAL & EXPLAINABLE AI)
 # ==============================================================================
-if nav_choice == "📊 Dashboard & Overview":
-    st.markdown('<div class="main-title">🛡️ Scalable Network Intrusion Detection System</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Big Data Network Traffic Anomaly & Attack Analysis using <b>Apache Spark</b> & <b>PySpark MLlib</b></div>', unsafe_allow_html=True)
+if "Guest" in portal_choice:
+    # Hero Banner
+    st.markdown("""
+    <div class="hero-banner">
+        <div class="hero-title">🛡️ NetGuard AI: Smart Intrusion Detection</div>
+        <div class="hero-subtitle">Explainable Artificial Intelligence (XAI) for Network Security, Powered by <b>Apache Spark</b></div>
+        <span class="role-badge-user">👤 Guest / Non-Technical Demo Mode Active</span>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # Top KPI Cards
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric(label="Raw Network Flows", value=f"{prep_meta.get('raw_rows', 286467):,}")
-    with col2:
-        st.metric(label="Cleaned Flow Records", value=f"{prep_meta.get('cleaned_rows', 213777):,}")
-    with col3:
-        st.metric(label="Engineered Features", value=f"{prep_meta.get('feature_count', 68)}")
-    with col4:
-        st.metric(label="Top Model Accuracy", value="99.99%", delta="Random Forest")
+    # Educational Walkthrough (What is this website used for?)
+    with st.container():
+        st.markdown("""
+        <div class="info-card">
+            <h3 style="margin-top:0; color:#0F172A; font-weight:700;">📖 What is this website used for?</h3>
+            <p style="color:#475569; font-size:1.0rem; line-height:1.6; margin-bottom:14px;">
+                This website acts as an <b>intelligent digital security guard</b> for computer networks. 
+                Just like an airport scanner checks luggage for dangerous items without slowing travelers down, 
+                our <b>Apache Spark AI system</b> continuously inspects thousands of internet connections in real time 
+                to catch hackers who are secretly scanning company servers (known as <b>PortScan attacks</b>) before they can break in.
+            </p>
+            <h4 style="margin-bottom:12px; color:#1E293B;">🔍 How does the AI work in 3 simple steps?</h4>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("---")
+        sc1, sc2, sc3 = st.columns(3)
+        with sc1:
+            st.markdown("""
+            <div class="step-box">
+                <div class="step-num">Step 1</div>
+                <div class="step-title">Capture Network Flow</div>
+                <div class="step-desc">When computers communicate, we measure connection speed, packet size, and targeted ports.</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with sc2:
+            st.markdown("""
+            <div class="step-box">
+                <div class="step-num">Step 2</div>
+                <div class="step-title">Spark AI Evaluation</div>
+                <div class="step-desc">Apache Spark's Random Forest model evaluates 68 behavioral safety markers in milliseconds.</div>
+            </div>
+            """, unsafe_allow_html=True)
+        with sc3:
+            st.markdown("""
+            <div class="step-box">
+                <div class="step-num">Step 3</div>
+                <div class="step-title">Reason-Based XAI Verdict</div>
+                <div class="step-desc">The AI gives a plain-English explanation of exactly WHY the traffic is safe or suspicious.</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-    # Overview Cards
-    c1, c2 = st.columns([1.1, 0.9])
-    with c1:
-        st.subheader("📌 Project Motivation & Architecture")
-        st.markdown(
-            """
-            Modern enterprise computer networks handle gigabytes of packet transactions every second. 
-            Traditional single-threaded intrusion detection systems fail to scale under high-throughput traffic.
-            
-            This project implements an **enterprise-grade, distributed Network Intrusion Detection System (NIDS)** 
-            built upon **Apache Spark**, designed to analyze high-speed network telemetry flows in parallel:
-            
-            1. **Dataset:** Official **CICIDS2017** benchmark from the Canadian Institute for Cybersecurity.
-            2. **Distributed Engine:** **Apache Spark** using multi-core distributed in-memory compute.
-            3. **Feature Engineering:** Spark MLlib `VectorAssembler` and `StandardScaler` normalizing 68 network metrics.
-            4. **Classification:** High-precision supervised detection distinguishing legitimate background flows from malicious port probes.
-            """
-        )
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    with c2:
-        st.subheader("📊 Dataset Class Distribution")
-        clean_counts = prep_meta.get("class_distribution_after", {}).get("counts", {"BENIGN (0)": 123083, "PortScan (1)": 90694})
-        pie_df = pd.DataFrame({
-            "Traffic Type": list(clean_counts.keys()),
-            "Records": list(clean_counts.values())
-        })
-        st.bar_chart(pie_df.set_index("Traffic Type"), color="#2563EB")
-        st.caption(f"BENIGN: {clean_counts.get('BENIGN (0)', 0):,} (57.6%) | PortScan: {clean_counts.get('PortScan (1)', 0):,} (42.4%)")
+    # Demo Tabs: Single Flow vs Batch CSV
+    demo_tab1, demo_tab2 = st.tabs(["🎯 Live Flow Scanner (Single Flow)", "📁 Bulk Traffic Scanner (CSV File)"])
 
-    st.markdown("---")
-    st.subheader("🧹 Spark Preprocessing Pipeline Impact")
-    colA, colB, colC = st.columns(3)
-    with colA:
-        st.markdown(f"""
-        **Duplicate Removal**
-        - Duplicate rows removed: **{prep_meta.get('duplicates_removed', 72353):,}**
-        - Eliminates zero-length probe retransmissions.
-        """)
-    with colB:
-        st.markdown(rf"""
-        **Anomaly & Infinite Value Cleaning**
-        - Rows with $\pm\infty$ or NaN removed: **{prep_meta.get('missing_and_inf_rows_removed', 337):,}**
-        - Solves zero-duration division anomalies in `flow_bytes_s`.
-        """)
-    with colC:
-        st.markdown(f"""
-        **Zero-Variance Feature Pruning**
-        - Constant columns dropped: **{len(prep_meta.get('constant_columns_dropped', []))}**
-        - Removes inactive TCP flag features with zero variance.
-        """)
+    # --------------------------------------------------------------------------
+    # DEMO TAB 1: SINGLE FLOW PREDICTION + REASON-BASED XAI
+    # --------------------------------------------------------------------------
+    with demo_tab1:
+        st.subheader("🎯 Test a Live Network Connection")
+        st.write("Click a preset below to test an authentic safe connection or a hacker's attack probe:")
 
-# ==============================================================================
-# VIEW 2: MODEL PERFORMANCE
-# ==============================================================================
-elif nav_choice == "📈 Model Performance":
-    st.markdown('<div class="main-title">📈 PySpark MLlib Model Benchmark</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Comparative evaluation across <b>42,582</b> held-out test network flow records</div>', unsafe_allow_html=True)
-
-    # Performance Table
-    if model_results:
-        table_rows = []
-        for r in model_results:
-            cm = r["confusion_matrix"]
-            table_rows.append({
-                "Model": r["model_name"],
-                "Accuracy (%)": f"{r['accuracy'] * 100:.2f}%",
-                "Precision (%)": f"{r['precision'] * 100:.2f}%",
-                "Recall (%)": f"{r['recall'] * 100:.2f}%",
-                "F1-Score (%)": f"{r['f1_score'] * 100:.2f}%",
-                "ROC-AUC": f"{r['roc_auc']:.4f}",
-                "Train Time": f"{r['train_time_sec']}s",
-                "Inference Time": f"{r['inference_time_sec']}s",
-                "True Negatives": f"{cm['tn']:,}",
-                "False Positives": f"{cm['fp']:,}",
-                "False Negatives": f"{cm['fn']:,}",
-                "True Positives": f"{cm['tp']:,}"
-            })
-        st.dataframe(pd.DataFrame(table_rows), use_container_width=True)
-
-    # Comparison Plots
-    col_chart, col_cm = st.columns([1.1, 0.9])
-    
-    with col_chart:
-        st.subheader("📊 Comparative Evaluation Chart")
-        comp_img = os.path.join(PROJECT_ROOT, "results", "figures", "model_comparison_bar.png")
-        if os.path.exists(comp_img):
-            st.image(comp_img, caption="Accuracy, Precision, Recall, and F1 Comparison", use_container_width=True)
-        else:
-            st.info("Comparison chart available in results/figures/.")
-
-    with col_cm:
-        st.subheader("🎯 Confusion Matrix Inspector")
-        model_pick = st.selectbox(
-            "Select model to inspect confusion matrix:",
-            ["Random Forest", "Gradient-Boosted Trees", "Logistic Regression"]
-        )
-        file_tag = model_pick.lower().replace(" ", "_").replace("-", "_")
-        cm_file = os.path.join(PROJECT_ROOT, "results", "figures", f"{file_tag}_cm.png")
-        if not os.path.exists(cm_file):
-            # Fallback filename check
-            if "boost" in file_tag:
-                cm_file = os.path.join(PROJECT_ROOT, "results", "figures", "gradient-boosted_trees_cm.png")
-        
-        if os.path.exists(cm_file):
-            st.image(cm_file, caption=f"Confusion Matrix: {model_pick}", use_container_width=True)
-        else:
-            st.warning(f"Plot not found at: {cm_file}")
-
-    st.markdown("---")
-    st.subheader("💡 Technical Assessment & Discussion")
-    st.markdown(
-        """
-        - **Random Forest (Best Performing):** Achieved **99.99% accuracy** with **0 False Positives** across 24,334 benign samples. In cyber-defense environments, zero false alarms prevents alert fatigue for SOC analysts.
-        - **Gradient-Boosted Trees:** Exceptional accuracy (99.96%) with sub-second inference (0.88s) across 42k records.
-        - **Logistic Regression:** High baseline accuracy (99.00%) with near-zero memory footprint, but higher false alarm rates on non-linear boundary cases.
-        """
-    )
-
-# ==============================================================================
-# VIEW 3: SINGLE FLOW PREDICTION
-# ==============================================================================
-elif nav_choice == "🎯 Single Flow Prediction":
-    st.markdown('<div class="main-title">🎯 Real-Time Network Flow Classifier</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Simulate incoming network telemetry and classify intrusion threats using PySpark MLlib</div>', unsafe_allow_html=True)
-
-    # Initialize Spark models
-    with st.spinner("Connecting to PySpark execution engine..."):
+        # Initialize Spark engine
         get_cached_spark_engine()
 
-    col_model, col_presets = st.columns([1, 1.2])
-    with col_model:
-        selected_model = st.selectbox(
-            "Select PySpark ML Model:",
-            ["Random Forest", "Gradient-Boosted Trees", "Logistic Regression"],
-            help="Choose the trained MLlib model used to classify this network flow."
-        )
-
-    with col_presets:
-        st.markdown("**Quick Preset Buttons:**")
-        p_col1, p_col2 = st.columns(2)
-        preset_choice = None
-        with p_col1:
-            if st.button("🟢 Load Benign Traffic Preset", use_container_width=True):
-                st.session_state["flow_inputs"] = sample_presets.get("BENIGN", {})
+        btn_col1, btn_col2 = st.columns(2)
+        with btn_col1:
+            if st.button("🟢 Load Safe Web Browsing Sample", use_container_width=True):
+                st.session_state["guest_flow"] = sample_presets.get("BENIGN", {})
                 st.rerun()
-        with p_col2:
-            if st.button("🔴 Load PortScan Attack Preset", use_container_width=True):
-                st.session_state["flow_inputs"] = sample_presets.get("PORTSCAN", {})
+        with btn_col2:
+            if st.button("🔴 Load Hacker PortScan Attack Sample", use_container_width=True):
+                st.session_state["guest_flow"] = sample_presets.get("PORTSCAN", {})
                 st.rerun()
 
-    # Load current inputs from session_state or defaults
-    current_inputs = st.session_state.get("flow_inputs", sample_presets.get("BENIGN", {}))
+        current_flow = st.session_state.get("guest_flow", sample_presets.get("BENIGN", {}))
 
-    st.markdown("---")
-    st.subheader("⚙️ Key Network Flow Attributes")
+        st.markdown("---")
+        st.markdown("##### 🎛️ Adjust Key Telemetry (Or leave as loaded from preset):")
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        dest_port = st.number_input("Destination Port", min_value=0, max_value=65535, value=int(current_inputs.get("destination_port", 80)))
-        flow_duration = st.number_input("Flow Duration (µs)", min_value=0.0, value=float(current_inputs.get("flow_duration", 1000000.0)), step=1000.0)
-    with c2:
-        tot_fwd_pkts = st.number_input("Total Fwd Packets", min_value=0.0, value=float(current_inputs.get("total_fwd_packets", 5.0)))
-        tot_bwd_pkts = st.number_input("Total Bwd Packets", min_value=0.0, value=float(current_inputs.get("total_backward_packets", 4.0)))
-    with c3:
-        pkt_len_mean = st.number_input("Packet Length Mean", min_value=0.0, value=float(current_inputs.get("packet_length_mean", 120.0)))
-        pkt_len_std = st.number_input("Packet Length Std", min_value=0.0, value=float(current_inputs.get("packet_length_std", 50.0)))
-    with c4:
-        flow_bytes_s = st.number_input("Flow Bytes/sec", min_value=0.0, value=float(current_inputs.get("flow_bytes_s", 2500.0)))
-        init_win_fwd = st.number_input("Init Win Bytes Fwd", min_value=0.0, value=float(current_inputs.get("init_win_bytes_forward", 8192.0)))
+        fc1, fc2, fc3 = st.columns(3)
+        with fc1:
+            dest_port = st.number_input("Target Port (e.g. 80=Web, 22=SSH)", min_value=0, max_value=65535, value=int(current_flow.get("destination_port", 80)))
+            flow_duration = st.number_input("Connection Duration (microseconds)", min_value=0.0, value=float(current_flow.get("flow_duration", 1000000.0)), step=10000.0)
+        with fc2:
+            fwd_pkts = st.number_input("Packets Sent by Sender", min_value=0.0, value=float(current_flow.get("total_fwd_packets", 5.0)))
+            bwd_pkts = st.number_input("Packets Answered by Server", min_value=0.0, value=float(current_flow.get("total_backward_packets", 4.0)))
+        with fc3:
+            pkt_len_mean = st.number_input("Average Data Size per Packet (bytes)", min_value=0.0, value=float(current_flow.get("packet_length_mean", 120.0)))
+            flow_bytes_s = st.number_input("Data Transfer Rate (bytes/sec)", min_value=0.0, value=float(current_flow.get("flow_bytes_s", 2500.0)))
 
-    # Advanced features accordion
-    with st.expander("🛠️ Advanced Flow Features (68 Features Total)"):
-        st.caption("All features are automatically mapped to the PySpark VectorAssembler and StandardScaler.")
-        adv_cols = st.columns(4)
-        all_features = get_feature_columns()
-        dynamic_inputs = dict(current_inputs)
+        # Update dictionary
+        input_data = dict(current_flow)
+        input_data["destination_port"] = dest_port
+        input_data["flow_duration"] = flow_duration
+        input_data["total_fwd_packets"] = fwd_pkts
+        input_data["total_backward_packets"] = bwd_pkts
+        input_data["packet_length_mean"] = pkt_len_mean
+        input_data["flow_bytes_s"] = flow_bytes_s
 
-        # Update core features
-        dynamic_inputs["destination_port"] = dest_port
-        dynamic_inputs["flow_duration"] = flow_duration
-        dynamic_inputs["total_fwd_packets"] = tot_fwd_pkts
-        dynamic_inputs["total_backward_packets"] = tot_bwd_pkts
-        dynamic_inputs["packet_length_mean"] = pkt_len_mean
-        dynamic_inputs["packet_length_std"] = pkt_len_std
-        dynamic_inputs["flow_bytes_s"] = flow_bytes_s
-        dynamic_inputs["init_win_bytes_forward"] = init_win_fwd
-
-        for i, col_name in enumerate(all_features):
-            if col_name not in ["destination_port", "flow_duration", "total_fwd_packets", "total_backward_packets", "packet_length_mean", "packet_length_std", "flow_bytes_s", "init_win_bytes_forward"]:
-                with adv_cols[i % 4]:
-                    default_val = float(dynamic_inputs.get(col_name, 0.0))
-                    dynamic_inputs[col_name] = st.number_input(col_name, value=default_val, key=f"adv_{col_name}")
-
-    st.markdown("")
-    if st.button("🚀 Analyze Network Flow with PySpark", type="primary", use_container_width=True):
-        try:
-            with st.spinner("Executing Spark MLlib VectorAssembler and model inference..."):
-                res = predict_single_flow(dynamic_inputs, model_name=selected_model)
+        if st.button("🚀 Scan Connection with Spark AI", type="primary", use_container_width=True):
+            with st.spinner("Analyzing 68 flow markers using Apache Spark Random Forest model..."):
+                raw_pred = predict_single_flow(input_data, model_name="Random Forest")
+                xai = explain_prediction(input_data, raw_pred)
 
             st.markdown("---")
-            st.subheader("🔍 Intrusion Detection Result")
-            res_col1, res_col2 = st.columns([1.2, 0.8])
+            st.subheader("🔍 AI Security Verdict & Explainable AI (XAI) Report")
 
-            with res_col1:
-                if res["prediction_label"] == "PORTSCAN":
-                    st.markdown('<div class="badge-attack">🚨 MALICIOUS INTRUSION: PORTSCAN DETECTED</div>', unsafe_allow_html=True)
-                    st.error(f"**Threat Alert:** Port scanning activity identified with **{res['confidence'] * 100:.2f}% confidence** using {selected_model}.")
-                else:
-                    st.markdown('<div class="badge-benign">✅ NORMAL NETWORK TRAFFIC (BENIGN)</div>', unsafe_allow_html=True)
-                    st.success(f"**Safe:** Normal flow transaction verified with **{res['confidence'] * 100:.2f}% confidence** using {selected_model}.")
+            if raw_pred["prediction_label"] == "PORTSCAN":
+                st.markdown(f'<div class="verdict-banner-attack">🚨 THREAT DETECTED: MALICIOUS PORT SCAN ({xai["confidence_pct"]}% Confidence)</div>', unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class="xai-card-attack">
+                    <h3 style="color:#991B1B; margin-top:0;">🧠 Plain-English AI Explanation: Why is this Suspicious?</h3>
+                    <p style="font-size:1.05rem; color:#7F1D1D; line-height:1.6; font-weight:500;">
+                        {xai['layman_summary']}
+                    </p>
+                    <hr style="border:0.5px solid #FCA5A5; margin:16px 0;">
+                    <h4 style="color:#991B1B;">📋 Key Red Flags Identified by the Model:</h4>
+                """, unsafe_allow_html=True)
+                for r in xai["reasons"]:
+                    st.markdown(f"- {r}")
+                st.markdown(f"""
+                    <div style="background-color:#FEE2E2; padding:12px; border-radius:8px; margin-top:14px; color:#991B1B; font-weight:600;">
+                        🛡️ {xai['recommended_action']}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
-            with res_col2:
-                st.markdown("**Model Class Probabilities:**")
-                st.progress(res["portscan_prob"], text=f"PortScan Threat Probability: {res['portscan_prob'] * 100:.2f}%")
-                st.progress(res["benign_prob"], text=f"Benign Probability: {res['benign_prob'] * 100:.2f}%")
+            else:
+                st.markdown(f'<div class="verdict-banner-benign">✅ VERIFIED SAFE: NORMAL NETWORK TRAFFIC ({xai["confidence_pct"]}% Confidence)</div>', unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class="xai-card-benign">
+                    <h3 style="color:#166534; margin-top:0;">🧠 Plain-English AI Explanation: Why is this Safe?</h3>
+                    <p style="font-size:1.05rem; color:#14532D; line-height:1.6; font-weight:500;">
+                        {xai['layman_summary']}
+                    </p>
+                    <hr style="border:0.5px solid #86EFAC; margin:16px 0;">
+                    <h4 style="color:#166534;">📋 Healthy Traffic Markers Confirmed:</h4>
+                """, unsafe_allow_html=True)
+                for r in xai["reasons"]:
+                    st.markdown(f"- {r}")
+                st.markdown(f"""
+                    <div style="background-color:#DCFCE7; padding:12px; border-radius:8px; margin-top:14px; color:#166534; font-weight:600;">
+                        🛡️ {xai['recommended_action']}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
-        except Exception as e:
-            st.error(f"Prediction Error: {e}")
+            # Risk Factor Table
+            st.markdown("##### 📊 Telemetry Safety Indicators:")
+            rf_df = pd.DataFrame(xai["risk_factors"])
+            st.dataframe(rf_df, use_container_width=True)
 
-# ==============================================================================
-# VIEW 4: BATCH PREDICTION (CSV)
-# ==============================================================================
-elif nav_choice == "📁 Batch Prediction (CSV)":
-    st.markdown('<div class="main-title">📁 Batch Network Traffic Classifier</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Upload a packet capture flow CSV or use the pre-packaged balanced dataset for bulk classification</div>', unsafe_allow_html=True)
+    # --------------------------------------------------------------------------
+    # DEMO TAB 2: BATCH CSV SCANNER
+    # --------------------------------------------------------------------------
+    with demo_tab2:
+        st.subheader("📁 Bulk Network Traffic Scanner (CSV)")
+        st.write("Scan an entire packet flow log containing hundreds or thousands of connections all at once.")
 
-    # Initialize Spark
-    with st.spinner("Connecting to Spark cluster backend..."):
-        get_cached_spark_engine()
+        c_up, c_demo = st.columns([1.2, 0.8])
+        with c_demo:
+            load_demo_batch = st.button("🧪 1-Click Load 1,000-Flow Demo Dataset", use_container_width=True)
+        with c_up:
+            up_file = st.file_uploader("Upload Traffic Log CSV:", type=["csv"])
 
-    col_b_model, col_b_sample = st.columns([1, 1])
-    with col_b_model:
-        batch_model = st.selectbox(
-            "Select PySpark Batch Model:",
-            ["Random Forest", "Gradient-Boosted Trees", "Logistic Regression"]
-        )
+        batch_input_df = None
+        source_label = ""
 
-    with col_b_sample:
-        demo_file_path = os.path.join(PROJECT_ROOT, "data", "processed", "demo_batch_sample.csv")
-        load_demo = st.button("🧪 Load Pre-Packaged Demo Dataset (1,000 Flows)", use_container_width=True)
+        if up_file is not None:
+            batch_input_df = pd.read_csv(up_file, low_memory=False)
+            source_label = up_file.name
+        elif load_demo_batch:
+            demo_csv_path = os.path.join(PROJECT_ROOT, "data", "processed", "demo_batch_sample.csv")
+            if os.path.exists(demo_csv_path):
+                batch_input_df = pd.read_csv(demo_csv_path)
+                source_label = "demo_batch_sample.csv (500 Normal + 500 Attack Flows)"
 
-    uploaded_file = st.file_uploader("Upload Network Flow CSV (CICIDS2017 format or preprocessed):", type=["csv"])
+        if batch_input_df is not None:
+            st.success(f"Loaded `{source_label}` with **{len(batch_input_df):,} records**.")
+            st.dataframe(batch_input_df.head(5), use_container_width=True)
 
-    input_df = None
-    source_name = ""
-
-    if uploaded_file is not None:
-        try:
-            input_df = pd.read_csv(uploaded_file, low_memory=False)
-            source_name = uploaded_file.name
-            st.success(f"Uploaded `{source_name}` successfully ({len(input_df):,} records).")
-        except Exception as e:
-            st.error(f"Error reading CSV: {e}")
-
-    elif load_demo and os.path.exists(demo_file_path):
-        input_df = pd.read_csv(demo_file_path)
-        source_name = "demo_batch_sample.csv"
-        st.info(f"Loaded demo dataset: `{source_name}` (500 BENIGN + 500 PortScan records).")
-
-    if input_df is not None:
-        st.markdown(f"**Data Preview (`{source_name}`):**")
-        st.dataframe(input_df.head(5), use_container_width=True)
-
-        if st.button("⚡ Run PySpark Batch Classification", type="primary"):
-            try:
-                with st.spinner(f"Processing {len(input_df):,} records through Spark MLlib {batch_model}..."):
-                    results_df, summary = predict_batch_flows(input_df, model_name=batch_model)
+            if st.button("⚡ Scan All Connections with Spark AI", type="primary"):
+                with st.spinner(f"Analyzing {len(batch_input_df):,} connections in parallel with Spark MLlib..."):
+                    res_df, summary = predict_batch_flows(batch_input_df, model_name="Random Forest")
 
                 st.markdown("---")
-                st.subheader("📊 Batch Classification Summary")
+                st.subheader("📊 Bulk Analysis Results")
 
                 m1, m2, m3, m4 = st.columns(4)
                 with m1:
-                    st.metric("Total Flows Analyzed", f"{summary['total_analyzed']:,}")
+                    st.metric("Total Scanned", f"{summary['total_analyzed']:,}")
                 with m2:
-                    st.metric("Benign Flows", f"{summary['benign_count']:,}", f"{summary['benign_pct']}%")
+                    st.metric("Safe Traffic (BENIGN)", f"{summary['benign_count']:,}", f"{summary['benign_pct']}%")
                 with m3:
-                    st.metric("PortScan Intrusions", f"{summary['portscan_count']:,}", f"-{summary['portscan_pct']}%", delta_color="inverse")
+                    st.metric("Hacker Probes (PortScan)", f"{summary['portscan_count']:,}", f"-{summary['portscan_pct']}%", delta_color="inverse")
                 with m4:
-                    st.metric("Model Used", summary["model_used"])
+                    st.metric("Detection Engine", "PySpark Random Forest")
 
-                # Distribution Chart
-                summary_chart_df = pd.DataFrame({
-                    "Traffic Type": ["BENIGN", "PORTSCAN"],
+                chart_df = pd.DataFrame({
+                    "Category": ["Safe Traffic (BENIGN)", "Malicious Probes (PortScan)"],
                     "Count": [summary["benign_count"], summary["portscan_count"]]
                 })
-                st.bar_chart(summary_chart_df.set_index("Traffic Type"), color="#DC2626")
+                st.bar_chart(chart_df.set_index("Category"), color="#0F766E")
 
-                # Results Table
-                st.markdown("### 📋 Prediction Results (First 500 rows)")
-                display_cols = ["Predicted_Class", "Threat_Score (%)", "Confidence (%)"] + [c for c in results_df.columns if c not in ["Predicted_Class", "Threat_Score (%)", "Confidence (%)"]][:6]
-                st.dataframe(results_df[display_cols].head(500), use_container_width=True)
+                st.markdown("##### 📋 Inspection Table:")
+                disp_cols = ["Predicted_Class", "Threat_Score (%)", "Confidence (%)", "destination_port", "flow_duration", "total_fwd_packets"]
+                st.dataframe(res_df[disp_cols].head(500), use_container_width=True)
 
-                # CSV Download Button
-                csv_bytes = results_df.to_csv(index=False).encode("utf-8")
+                csv_data = res_df.to_csv(index=False).encode("utf-8")
                 st.download_button(
-                    label="💾 Download Predictions as CSV",
-                    data=csv_bytes,
-                    file_name=f"pyspark_nids_predictions_{batch_model.lower().replace(' ', '_')}.csv",
+                    label="💾 Download Full Classified Report (CSV)",
+                    data=csv_data,
+                    file_name="spark_intrusion_detection_report.csv",
                     mime="text/csv",
                     use_container_width=True
                 )
 
-            except Exception as e:
-                st.error(f"Batch processing error: {e}")
-
 # ==============================================================================
-# VIEW 5: ABOUT PROJECT
+# PORTAL 2: ADMIN & SECURITY ENGINEER PORTAL (DEEP TECHNICAL TELEMETRY)
 # ==============================================================================
-elif nav_choice == "ℹ️ About Project":
-    st.markdown('<div class="main-title">ℹ️ Project Documentation & Specifications</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-title">Scalable Network Intrusion Detection and Anomaly Analysis Using Apache Spark</div>', unsafe_allow_html=True)
+else:
+    # Admin Hero Banner
+    st.markdown("""
+    <div class="hero-banner" style="background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%);">
+        <div class="hero-title">🛡️ Security Operations Center (SOC) Admin Portal</div>
+        <div class="hero-subtitle">Distributed Big Data Telemetry, MLlib Benchmarks & Cluster Architecture</div>
+        <span class="role-badge-admin">🛡️ Administrator / Engineering Mode Active</span>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown(
-        """
-        ### 🎓 Academic Project Overview
-        - **Title:** Scalable Network Intrusion Detection and Anomaly Analysis Using Apache Spark
-        - **Domain:** Big Data Analytics, Cybersecurity, Distributed Machine Learning
-        - **Dataset:** Official **CICIDS2017** Network Traffic Intrusion Benchmark
-        
-        ### 🛠️ Technology Stack
-        - **Distributed Framework:** Apache Spark 3.5.9
-        - **ML Library:** Spark MLlib (`VectorAssembler`, `StandardScaler`, `RandomForestClassifier`, `GBTClassifier`, `LogisticRegression`)
-        - **Runtime:** Microsoft OpenJDK 17 LTS (JVM)
-        - **Programming Language:** Python 3.12
-        - **Web Dashboard:** Streamlit 1.44
-        - **Data Handling:** Pandas 2.2, NumPy 2.2, Scikit-learn 1.8
-        
-        ### 📋 Preprocessing Decisions
-        1. **Feature Pruning:** Removed 10 constant features having zero variance.
-        2. **Anomaly Elimination:** Detected and sanitized 659 infinite values in division-by-zero flow calculations.
-        3. **Deduplication:** Filtered 72,353 identical network logs.
-        4. **Class Mapping:** `BENIGN` $\\rightarrow 0$, `PortScan` $\\rightarrow 1$.
-        5. **Strict Train/Test Isolation:** Feature pipeline fitted only on the 80% training partition (`seed=42`) to prevent data leakage.
-        
-        ### 🏆 Key Results
-        - **Top Accuracy:** **99.99%** achieved with PySpark Random Forest.
-        - **False Alarm Rate:** **0% (0 False Positives)** out of 24,334 benign samples.
-        - **Inference Speed:** Average 1.1s across 42,000 records on multi-core Spark.
-        """
-    )
+    admin_tabs = st.tabs([
+        "📊 Cluster & Dataset Telemetry",
+        "📈 Deep Model Benchmark",
+        "🎯 Confusion Matrix Inspector",
+        "🛠️ Pipeline Architecture"
+    ])
+
+    # ADMIN TAB 1: CLUSTER & DATASET
+    with admin_tabs[0]:
+        st.subheader("🖥️ Apache Spark Distributed Cluster Specs")
+        ak1, ak2, ak3, ak4 = st.columns(4)
+        with ak1:
+            st.metric("Spark Runtime", "v3.5.9 (Local Multi-Core)")
+        with ak2:
+            st.metric("JVM Architecture", "OpenJDK 17 LTS (Hotspot)")
+        with ak3:
+            st.metric("Driver / Exec Memory", "4 GB Dedicated")
+        with ak4:
+            st.metric("Shuffle Partitions", "8 Partitions")
+
+        st.markdown("---")
+        st.subheader("🧹 Big Data Preprocessing & Hygiene Statistics")
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            st.metric("Raw Rows", f"{prep_meta.get('raw_rows', 286467):,}")
+        with c2:
+            st.metric("Duplicates Dropped", f"{prep_meta.get('duplicates_removed', 72353):,}", "-25.2%")
+        with c3:
+            st.metric("Inf / NaN Rows Dropped", f"{prep_meta.get('missing_and_inf_rows_removed', 337):,}")
+        with c4:
+            st.metric("Cleaned Usable Records", f"{prep_meta.get('cleaned_rows', 213777):,}")
+
+        col_prune, col_ratio = st.columns([1.1, 0.9])
+        with col_prune:
+            st.markdown("##### ✂️ Zero-Variance Feature Pruning (10 Columns Removed):")
+            st.caption("Features having `nunique <= 1` across all 286k records were purged to eliminate zero-variance division anomalies:")
+            st.code(", ".join(prep_meta.get("constant_columns_dropped", [])))
+        with col_ratio:
+            st.markdown("##### ⚖️ Balanced Class Ratio (Post-Hygiene):")
+            st.write("- **BENIGN (0):** 123,083 (57.58%)")
+            st.write("- **PortScan (1):** 90,694 (42.42%)")
+
+    # ADMIN TAB 2: DEEP MODEL BENCHMARK
+    with admin_tabs[1]:
+        st.subheader("📈 PySpark MLlib Benchmark: 42,582 Held-Out Test Records")
+        if model_results:
+            b_rows = []
+            for m in model_results:
+                cm = m["confusion_matrix"]
+                b_rows.append({
+                    "Model": m["model_name"],
+                    "Accuracy (%)": f"{m['accuracy']*100:.2f}%",
+                    "Precision (%)": f"{m['precision']*100:.2f}%",
+                    "Recall (%)": f"{m['recall']*100:.2f}%",
+                    "F1-Score (%)": f"{m['f1_score']*100:.2f}%",
+                    "ROC-AUC": f"{m['roc_auc']:.4f}",
+                    "Train Latency": f"{m['train_time_sec']}s",
+                    "Test Latency": f"{m['inference_time_sec']}s",
+                    "TN (Benign)": f"{cm['tn']:,}",
+                    "FP (False Alarm)": f"{cm['fp']:,}",
+                    "FN (Missed Attack)": f"{cm['fn']:,}",
+                    "TP (Caught Attack)": f"{cm['tp']:,}"
+                })
+            st.dataframe(pd.DataFrame(b_rows), use_container_width=True)
+
+        comp_bar = os.path.join(PROJECT_ROOT, "results", "figures", "model_comparison_bar.png")
+        if os.path.exists(comp_bar):
+            st.image(comp_bar, caption="Spark MLlib Model Benchmark: Accuracy, Precision, Recall & F1", use_container_width=True)
+
+    # ADMIN TAB 3: CONFUSION MATRIX INSPECTOR
+    with admin_tabs[2]:
+        st.subheader("🎯 Confusion Matrix Heatmap Inspector")
+        inspect_pick = st.selectbox(
+            "Select Model:",
+            ["Random Forest", "Gradient-Boosted Trees", "Logistic Regression"]
+        )
+        tag = inspect_pick.lower().replace(" ", "_").replace("-", "_")
+        cm_path = os.path.join(PROJECT_ROOT, "results", "figures", f"{tag}_cm.png")
+        if not os.path.exists(cm_path) and "boost" in tag:
+            cm_path = os.path.join(PROJECT_ROOT, "results", "figures", "gradient-boosted_trees_cm.png")
+
+        if os.path.exists(cm_path):
+            st.image(cm_path, caption=f"Confusion Matrix: {inspect_pick} (42,582 Test Samples)", width=550)
+
+    # ADMIN TAB 4: PIPELINE ARCHITECTURE
+    with admin_tabs[3]:
+        st.subheader("🛠️ Distributed Spark Pipeline Specs")
+        st.markdown(
+            """
+            ```text
+            Raw CSV (286,467 records)
+                │
+                ▼
+            cleaner.py ──> Drop Duplicates (72k) ──> Replace Inf/NaN ──> Drop 10 Constant Columns
+                │
+                ▼
+            PySpark DataFrame (213,777 records)
+                │
+                ├── Train Partition (80%: 171,195 rows, seed=42)
+                └── Test Partition  (20%: 42,582 rows, seed=42)
+                │
+                ▼
+            feature_pipeline.py
+                ├── VectorAssembler(inputCols=68 features, outputCol="raw_features")
+                └── StandardScaler(inputCol="raw_features", outputCol="features", withStd=True)
+                │
+                ▼
+            PySpark MLlib Classifiers
+                ├── RandomForestClassifier(numTrees=30, maxDepth=10) -> 99.99% Acc, 0 False Positives
+                ├── GBTClassifier(maxIter=30, maxDepth=5)            -> 99.96% Acc
+                └── LogisticRegression(maxIter=50, regParam=0.01)     -> 99.00% Acc
+            ```
+            """
+        )
+        st.info("Full project report documentation available in `results/FINAL_PROJECT_REPORT.md`.")

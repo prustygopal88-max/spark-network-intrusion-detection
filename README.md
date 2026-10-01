@@ -1,20 +1,20 @@
 # Scalable Network Intrusion Detection and Anomaly Analysis Using Apache Spark
 
-An end-to-end Big Data cybersecurity mini-project that detects network intrusions and scanning anomalies at scale using **Apache Spark (PySpark MLlib)**, **Java OpenJDK 17 LTS**, and an interactive **Streamlit** dashboard.
+An enterprise-grade, distributed Big Data cybersecurity platform that detects network intrusions and scanning anomalies at scale using **Apache Spark 3.5.9 (PySpark MLlib)**, **Java OpenJDK 17 LTS**, and a futuristic, high-tech web interface powered by **FastAPI**, **Tailwind CSS**, and **Explainable AI (XAI)**.
 
 ---
 
 ## 📌 Project Overview & Objectives
 
 ### Problem Statement
-Enterprise networks generate millions of packet flow transactions every second. Traditional, single-node intrusion detection systems frequently suffer from CPU starvation, high memory overhead, and unacceptably high false alarm rates under heavy network load.
+Enterprise networks generate millions of packet flow transactions every second. Traditional single-threaded intrusion detection systems frequently suffer from CPU starvation, memory bottlenecks, and high false-alarm rates under heavy traffic volumes.
 
 ### Project Objective
 To build an automated, distributed machine learning intrusion detection pipeline on **Apache Spark** that:
 1. Ingests and sanitizes large-scale network telemetry.
 2. Extracts and standardizes 68 predictive network flow features.
 3. Evaluates three distributed classifiers: **Logistic Regression**, **Random Forest**, and **Gradient-Boosted Trees (GBT)**.
-4. Provides a presentation-ready Streamlit web interface for single-flow testing and batch classification.
+4. Delivers a presentation-ready, high-tech web platform featuring a **Two-Tier Role-Based Portal** (Guest Live Demo vs. Admin SOC Console) and **Reason-Based Explainable AI (XAI)**.
 
 ---
 
@@ -38,7 +38,9 @@ To build an automated, distributed machine learning intrusion detection pipeline
 | **Java Runtime** | **Microsoft OpenJDK** | 17.0.20 LTS | JVM execution runtime |
 | **Machine Learning** | **PySpark MLlib** | 3.5.9 | VectorAssembler, StandardScaler, RF, GBT, LR |
 | **Programming Language** | **Python** | 3.12.10 | Core scripting and pipeline orchestration |
-| **Web Dashboard** | **Streamlit** | 1.44.1 | Interactive user interface |
+| **Web Platform** | **FastAPI + Uvicorn** | 0.115 / 0.34 | High-performance asynchronous REST backend |
+| **UI Design System** | **HTML5 + Tailwind CSS + Glassmorphism** | Modern CDN | Cyber HUD, dark obsidian theme, neon telemetry borders |
+| **Data Visualization** | **Chart.js** | 4.4 | Real-time interactive charts and gauges |
 | **Data & Metrics** | **Pandas, NumPy, Scikit-learn** | 2.2, 2.2, 1.8 | Metric evaluation & tabular manipulations |
 | **Visualization** | **Matplotlib, Seaborn** | 3.10, 0.13 | Confusion matrix & comparison charts |
 
@@ -65,16 +67,14 @@ To build an automated, distributed machine learning intrusion detection pipeline
                  │
                  ▼
 [ PySpark MLlib Classifiers (train_models.py) ]
- ├── Logistic Regression
- ├── Random Forest Classifier (Top Model: 99.99% Accuracy, 0% FP)
+ ├── Logistic Regression (Baseline Linear Model)
+ ├── Random Forest Classifier (Top Model: 99.99% Accuracy, 0% False Positives)
  └── Gradient-Boosted Trees (GBT)
                  │
                  ▼
-[ Interactive Streamlit Dashboard (app/app.py) ]
- ├── Overview & Telemetry Metrics
- ├── Comparative Benchmark & Confusion Matrix Viewer
- ├── Real-Time Single Flow Classifier (with 1-Click Presets)
- └── Batch Network Flow Classifier with CSV Export
+[ NetGuard AI Enterprise Web Platform (FastAPI + Tailwind CSS) ]
+ ├── 👤 Guest / Non-Technical Demo Portal (Explainable AI & Live Presets)
+ └── 🛡️ Admin & SOC Engineer Portal (Cluster Specs, Confusion Matrix, Benchmarks)
 ```
 
 ---
@@ -84,18 +84,20 @@ To build an automated, distributed machine learning intrusion detection pipeline
 ```text
 spark-network-intrusion-detection/
 ├── app/
-│   └── app.py                      # Main Streamlit web application
+│   ├── server.py                   # FastAPI asynchronous REST backend server
+│   └── templates/
+│       └── index.html              # High-tech cyber dashboard (Tailwind + Chart.js + XAI)
 ├── data/
 │   ├── raw/                        # Original raw CICIDS2017 CSV dataset
 │   └── processed/                  # Cleaned parquet & demo CSV partitions
 │       ├── demo_batch_sample.csv   # 1,000-flow balanced demo dataset (500 Benign, 500 PortScan)
-│       ├── train.parquet           # 171,195 train flow records
-│       └── test.parquet            # 42,582 test flow records
+│       ├── cleaned_sample.csv      # 10,000-flow fast preview sample
+│       ├── train.parquet/          # 171,195 train flow records
+│       └── test.parquet/           # 42,582 test flow records
 ├── hadoop/                         # Windows winutils binaries for Spark File I/O
-│   └── bin/
-│       ├── hadoop.dll
-│       └── winutils.exe
+│   └── bin/ (hadoop.dll, winutils.exe)
 ├── notebooks/                      # Exploratory notebooks
+│   └── 01_interactive_spark_analysis.ipynb
 ├── results/
 │   ├── figures/                    # Saved confusion matrices & comparison charts
 │   ├── models/                     # Saved PySpark MLlib models & feature pipeline
@@ -107,19 +109,26 @@ spark-network-intrusion-detection/
 │   ├── model_comparison.csv
 │   ├── model_comparison.md
 │   ├── preprocessing_report.json   # Preprocessing diagnostic report
-│   ├── sample_presets.json         # Preset flows for 1-click Streamlit testing
+│   ├── sample_presets.json         # Preset flows for 1-click testing
 │   └── FINAL_PROJECT_REPORT.md     # Full academic project report
+├── screenshots/                    # UI Screenshots for documentation
+│   ├── dashboard.png               # Main Overview & 3-Step Workflow
+│   ├── single_prediction.png       # Live Connection Scanner & XAI Report
+│   ├── batch_prediction.png        # Bulk Traffic Classifier & Upload Zone
+│   ├── batch_results.png           # Batch Results Preview Table & Download
+│   └── model_performance.png       # Admin SOC Console & Spark Telemetry
 ├── src/
 │   ├── evaluation/
-│   │   └── metrics.py              # Accuracy, Precision, Recall, F1, ROC-AUC, CM plots
+│   │   ├── metrics.py              # Accuracy, Precision, Recall, F1, ROC-AUC, CM plots
+│   │   └── xai_explainer.py        # Reason-Based Explainable AI (XAI) engine
 │   ├── models/
-│   │   ├── predictor.py            # Real-time and batch inference engine
+│   │   ├── predictor.py            # Real-time single & batch Spark inference engine
 │   │   └── train_models.py         # PySpark model training & evaluation runner
 │   ├── preprocessing/
 │   │   ├── cleaner.py              # Data cleaning and sanity filtering
 │   │   ├── download_dataset.py     # Automated dataset downloader
 │   │   ├── feature_pipeline.py     # VectorAssembler & StandardScaler module
-│   │   ├── inspect_data.py         # Initial raw dataset diagnostics
+│   │   ├── inspect_data.py         # Dataset diagnostic utility
 │   │   └── run_preprocessing.py    # Master preprocessing runner
 │   └── spark/
 │       └── spark_session.py        # Reusable SparkSession factory with Windows bindings
@@ -137,7 +146,7 @@ spark-network-intrusion-detection/
 
 Evaluated on **42,582 independent test records**:
 
-| Model | Accuracy (%) | Precision (%) | Recall (%) | F1-Score (%) | ROC-AUC | Training Time | Test Inference Time |
+| Model | Accuracy (%) | Precision (%) | Recall (%) | F1-Score (%) | ROC-AUC | Training Time | Test Latency |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Random Forest** ⭐ | **99.99%** | **100.00%** | **99.98%** | **99.99%** | **1.0000** | **7.01s** | 1.23s |
 | **Gradient-Boosted Trees** | **99.96%** | **99.95%** | **99.96%** | **99.95%** | **0.9999** | 31.66s | **0.88s** |
@@ -153,113 +162,123 @@ Evaluated on **42,582 independent test records**:
 
 ---
 
-## ⚙️ Installation & Setup Guide
-
-### 1. Prerequisites
-- **Python 3.12** installed and available in PATH.
-- **Java OpenJDK 17 LTS**: Required for Apache Spark. If missing on Windows:
-  ```powershell
-  winget install Microsoft.OpenJDK.17 --source winget --accept-package-agreements --accept-source-agreements
-  ```
-
-### 2. Install Python Dependencies
-From the project root folder, run:
-```bash
-python -m pip install -r requirements.txt
-```
-
----
-
 ## 🚀 How to Run the Project
 
-### 1. Launch the Streamlit Web Application
-To launch the interactive dashboard, run:
+### 1. Launch the NetGuard AI Web Application
+To launch the high-tech cybersecurity web platform, run:
 ```bash
-python -m streamlit run app/app.py
+python app/server.py
 ```
-Open your browser and navigate to: **`http://localhost:8501`**
-
-### 2. Dashboard Features & Usage
-- **📊 Dashboard & Overview:** Review high-level metrics, dataset class balance, and data preprocessing impact.
-- **📈 Model Performance:** Inspect side-by-side accuracy metrics, training latency, and confusion matrix heatmaps.
-- **🎯 Single Flow Prediction:**
-  - Select model: Random Forest, GBT, or Logistic Regression.
-  - Click **"🟢 Load Benign Traffic Preset"** or **"🔴 Load PortScan Attack Preset"** to populate realistic values.
-  - Click **"🚀 Analyze Network Flow with PySpark"** to view real-time intrusion verdicts, threat scores, and probability progress bars.
-- **📁 Batch Prediction (CSV):**
-  - Click **"🧪 Load Pre-Packaged Demo Dataset (1,000 Flows)"** or upload your own CSV file.
-  - Click **"⚡ Run PySpark Batch Classification"** to process records in parallel.
-  - Review traffic distributions, threat scores, and click **"💾 Download Predictions as CSV"** to save results.
-- **ℹ️ About Project:** Full architecture documentation and academic references.
-
-## 📸 Project Screenshots
-
-### 1. Dashboard & Overview
-
-The main dashboard provides an overview of the network intrusion detection system, including the number of raw network flows, cleaned records, engineered features, model accuracy, and dataset class distribution.
-
-![Dashboard](screenshots/dashboard.png)
+Open your browser and navigate to: **`http://localhost:8000`**
 
 ---
 
-### 2. Model Performance
+### 2. Two-Tier Portal & Dashboard Features
 
-This section compares the three PySpark MLlib models used in the project: Logistic Regression, Random Forest, and Gradient-Boosted Trees. It includes accuracy, precision, recall, F1-score, ROC-AUC, training time, inference time, and confusion matrix analysis.
+The web interface is split into two specialized operating modes:
 
-![Model Performance](screenshots/model_performance.png)
+#### 👤 Mode 1: Guest / Live Demo Portal (Non-Technical & Layman-Friendly)
+- **Plain-English Overview:** "What is this website used for?" and a 3-step walkthrough explaining how the AI protects corporate networks.
+- **🎯 Live Flow Scanner (Single Flow):**
+  - **1-Click Presets:** "🟢 Load Safe Web Browsing Sample" vs "🔴 Load Hacker PortScan Attack Sample".
+  - **🧠 Reason-Based Explainable AI (XAI):** Translates 68 raw network features into plain English explaining **WHY** a connection was flagged as malicious or safe (connection duration anomalies, asymmetric packet exchange, empty payloads, etc.).
+  - **Safety Indicators Table:** Visual traffic symmetry, payload size, and duration risk factors.
+  - **Actionable Advice:** Recommended firewall actions for security teams.
+- **📁 Bulk Traffic Scanner (CSV File):**
+  - **1-Click Demo:** Instantly loads 1,000 flows (`demo_batch_sample.csv`) or upload custom CSV logs.
+  - Displays safe vs. malicious distribution charts, summary metrics, and a downloadable classified CSV.
+
+#### 🛡️ Mode 2: Admin & Security Engineer Portal (Deep Big-Data & Spark MLlib)
+- **🖥️ Cluster & Dataset Telemetry:** Live Apache Spark 3.5.9 cluster settings, JVM runtime, memory allocations, and 286k $\rightarrow$ 213k cleaning metrics.
+- **📈 Deep Model Benchmark:** Full performance breakdown (Accuracy, Precision, Recall, F1, ROC-AUC, Latency) across Random Forest, GBT, and Logistic Regression.
+- **🎯 Confusion Matrix Inspector:** High-resolution confusion matrix heatmaps showing True Negatives, False Positives (0 on Random Forest!), False Negatives, and True Positives.
+- **🛠️ Pipeline Architecture:** Visual DAG flowchart of data cleaning, VectorAssembler, StandardScaler, and Spark MLlib estimators.
 
 ---
 
-### 3. Single Flow Prediction
+## 📸 Project Screenshots & High-Tech UI Previews
 
-The Single Flow Prediction module allows a user to select a PySpark MLlib model, provide network-flow attributes, and classify an individual network flow as BENIGN or PORTSCAN.
+Below are the visual previews of the enterprise NetGuard AI platform:
 
-![Single Flow Prediction](screenshots/single_prediction.png)
+### 1. Platform Overview & 3-Step Explainable AI Workflow
+The main landing page explaining the platform purpose, live telemetry HUD status, and the 3-step intrusion detection workflow:
 
----
-
-### 4. Batch Network Traffic Classification
-
-The Batch Prediction module allows users to upload a CICIDS2017-format CSV file or use the provided demo dataset containing 1,000 network flows.
-
-![Batch Prediction](screenshots/batch_prediction.png)
+![Dashboard Overview](screenshots/dashboard.png)
 
 ---
 
-### 5. Batch Classification Results
+### 2. Real-Time Connection Scanner & Reason-Based XAI Report
+Live single-flow testing with 1-click presets, threat score meter, and plain-English Explainable AI reasoning:
 
-After batch processing, the system displays the number of analyzed flows, benign flows, detected PortScan intrusions, the selected model, prediction results, threat scores, confidence values, and allows the predictions to be downloaded as a CSV file.
+![Single Flow Prediction and XAI Report](screenshots/single_prediction.png)
+
+---
+
+### 3. Bulk Network Traffic Classifier (CSV Upload & Demo Mode)
+The bulk classifier interface supporting drag-and-drop CSV uploads or 1-click pre-packaged demo datasets:
+
+![Batch Traffic Classifier](screenshots/batch_prediction.png)
+
+---
+
+### 4. Bulk Classification Analytics & CSV Export
+Multi-threaded classification breakdown, benign vs. attack metrics, preview table, and downloadable reports:
 
 ![Batch Classification Results](screenshots/batch_results.png)
 
-### 3. Run Automated Tests
-To run the automated verification suite:
-```bash
-python tests/test_end_to_end.py
-```
+---
 
-### 4. (Optional) Re-execute Pipeline Stages from Scratch
-If you wish to re-run data downloading, cleaning, or model training:
-```bash
-# 1. Inspect raw dataset
-python src/preprocessing/inspect_data.py
+### 5. Security Operations Center (SOC) Admin Portal & Spark Telemetry
+The administrative console detailing Apache Spark cluster parameters, Big Data cleaning metrics, and MLlib benchmarks:
 
-# 2. Run data cleaning and feature scaling pipeline (Stage 3)
-python src/preprocessing/run_preprocessing.py
-
-# 3. Train and benchmark all three models (Stage 4)
-python src/models/train_models.py
-```
+![Admin SOC Console and Model Performance](screenshots/model_performance.png)
 
 ---
 
-## 📋 Input Data Format for Batch Prediction
+## 💡 How to Update Screenshots Manually in VS Code
 
-When uploading custom CSV files for batch classification, the file can either be:
-1. **Preprocessed CSV:** Using snake_case column names (`destination_port`, `flow_duration`, etc.).
-2. **Raw CICIDS2017 Format:** Original CICIDS2017 CSV columns (e.g. `' Destination Port'`, `' Flow Duration'`, `'Flow Bytes/s'`).
+If you capture updated screenshots from your browser (`http://localhost:8000`):
 
-The pipeline's cleaning module automatically standardizes headers and fills any omitted features with default median values, ensuring zero crashes.
+1. Save your screenshots with the following filenames:
+   - `dashboard.png` (Landing page & Overview)
+   - `single_prediction.png` (Single connection scan with XAI report)
+   - `batch_prediction.png` (Batch CSV upload screen)
+   - `batch_results.png` (Batch results table & metrics)
+   - `model_performance.png` (Admin SOC portal view)
+2. Place them directly in the **`screenshots/`** directory in your project root.
+3. In VS Code, press **`Ctrl + Shift + V`** to preview this `README.md` with images rendered!
+
+---
+
+## 💻 Essential VS Code Commands
+
+Here are the exact terminal commands and shortcuts to manage this project inside Visual Studio Code:
+
+### 1. Open Project in VS Code
+Open your terminal (PowerShell / Command Prompt) and run:
+```powershell
+cd c:\Users\prust\OneDrive\Desktop\spark-network-intrusion-detection
+code .
+```
+
+### 2. Open Integrated Terminal in VS Code
+- **Shortcut:** Press **`Ctrl + ~`** (Control + Tilde) to open the built-in terminal.
+
+### 3. Run the Web Application
+Inside the VS Code integrated terminal:
+```powershell
+python app/server.py
+```
+Open **`http://localhost:8000`** in your browser.
+
+### 4. Preview Markdown with Images in VS Code
+- Open `README.md` in VS Code.
+- Press **`Ctrl + Shift + V`** to open the side-by-side Markdown Live Preview.
+
+### 5. Run Automated Tests in VS Code
+```powershell
+python tests/test_end_to_end.py
+```
 
 ---
 

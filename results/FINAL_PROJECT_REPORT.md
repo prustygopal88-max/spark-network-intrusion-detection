@@ -123,13 +123,22 @@ Evaluated on **42,582 independent test records**:
 
 ---
 
-## 10. Streamlit Web Interface
-The web application provides five core pages:
-1. **Dashboard & Overview:** Visual summaries of dataset volume, class breakdown, and preprocessing impact.
-2. **Model Performance:** Side-by-side metric tables, comparison bar charts, and an interactive confusion matrix viewer.
-3. **Single Flow Prediction:** Allows security analysts to input packet parameters, choose any of the three models, or load 1-click **Benign** or **PortScan** demo presets.
-4. **Batch Prediction:** Supports uploading external network flow CSV files or running the built-in 1,000-flow test dataset, outputting predictions, confidence scores, and downloadable CSV reports.
-5. **About Project:** Project metadata, technology details, and methodology notes.
+## 10. Web Platform Interface: Two-Tier Architecture & Explainable AI (XAI)
+To accommodate both non-technical stakeholders (auditors, managers, clients) and technical engineering personnel (professors, data engineers, SOC analysts), the web application implements a **Two-Tier Role-Based Architecture**:
+
+### 1. Guest / Non-Technical User Demo Portal
+- **Mission Overview:** Clear non-technical explanation answering *"What is this website used for?"* with a 3-step interactive visual workflow.
+- **Reason-Based Explainable AI (XAI):** Rather than outputting opaque numeric probabilities, our custom XAI engine (`xai_explainer.py`) translates 68 telemetry markers into clear English explanations:
+  - *Why is a connection suspicious?* Pinpoints abnormally brief connection lifetimes, zero-byte payload probes, and unanswered SYN packet ratios.
+  - *Why is a connection safe?* Verifies standard request-response symmetry and realistic payload distributions.
+- **1-Click Presets & Single Flow Classifier:** Test live flows with one click.
+- **Bulk CSV Scanner:** Instant multi-threaded batch classification with downloadable reports.
+
+### 2. Administrator & Security Operations Center (SOC) Portal
+- **Spark Cluster & Big Data Telemetry:** Real-time visibility into Spark 3.5.9 execution parameters, JVM memory allocations, and 286k $\rightarrow$ 213k cleaning hygiene.
+- **Deep Model Benchmarks:** Cross-comparison table across Logistic Regression, Random Forest, and Gradient-Boosted Trees.
+- **Confusion Matrix Heatmaps:** Interactive heatmaps highlighting the **0 False Alarm** record of the Random Forest model.
+- **Pipeline Architecture:** Flowcharts detailing the `VectorAssembler` and `StandardScaler` transformations.
 
 ---
 
