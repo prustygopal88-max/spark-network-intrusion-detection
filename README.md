@@ -204,7 +204,9 @@ Below are the visual previews of the enterprise NetGuard AI platform:
 The main landing page explaining the platform purpose, live telemetry HUD status, and the 3-step intrusion detection workflow:
 
 <p align="center">
-  <img src="./screenshots/dashboard.png" alt="Dashboard Overview" width="100%" />
+  <a href="./screenshots/dashboard.png">
+    <img src="./screenshots/dashboard.png" alt="Dashboard Overview" width="100%" />
+  </a>
 </p>
 
 ---
@@ -213,7 +215,9 @@ The main landing page explaining the platform purpose, live telemetry HUD status
 Live single-flow testing with 1-click presets, threat score meter, and plain-English Explainable AI reasoning:
 
 <p align="center">
-  <img src="./screenshots/single_prediction.png" alt="Single Flow Prediction and XAI Report" width="100%" />
+  <a href="./screenshots/single_prediction.png">
+    <img src="./screenshots/single_prediction.png" alt="Single Flow Prediction and XAI Report" width="100%" />
+  </a>
 </p>
 
 ---
@@ -222,7 +226,9 @@ Live single-flow testing with 1-click presets, threat score meter, and plain-Eng
 The bulk classifier interface supporting drag-and-drop CSV uploads or 1-click pre-packaged demo datasets:
 
 <p align="center">
-  <img src="./screenshots/batch_prediction.png" alt="Batch Traffic Classifier" width="100%" />
+  <a href="./screenshots/batch_prediction.png">
+    <img src="./screenshots/batch_prediction.png" alt="Batch Traffic Classifier" width="100%" />
+  </a>
 </p>
 
 ---
@@ -231,7 +237,9 @@ The bulk classifier interface supporting drag-and-drop CSV uploads or 1-click pr
 Multi-threaded classification breakdown, benign vs. attack metrics, preview table, and downloadable reports:
 
 <p align="center">
-  <img src="./screenshots/batch_results.png" alt="Batch Classification Results" width="100%" />
+  <a href="./screenshots/batch_results.png">
+    <img src="./screenshots/batch_results.png" alt="Batch Classification Results" width="100%" />
+  </a>
 </p>
 
 ---
@@ -240,7 +248,9 @@ Multi-threaded classification breakdown, benign vs. attack metrics, preview tabl
 The administrative console detailing Apache Spark cluster parameters, Big Data cleaning metrics, and MLlib benchmarks:
 
 <p align="center">
-  <img src="./screenshots/model_performance.png" alt="Admin SOC Console and Model Performance" width="100%" />
+  <a href="./screenshots/model_performance.png">
+    <img src="./screenshots/model_performance.png" alt="Admin SOC Console and Model Performance" width="100%" />
+  </a>
 </p>
 
 ---
@@ -320,3 +330,11 @@ python tests/test_end_to_end.py
 1. **Multi-Class Expansion:** Incorporate additional partitions from CICIDS2017 (DDoS, Botnet, Web Attacks) into a unified multi-class classifier.
 2. **Spark Structured Streaming:** Ingest real-time packet capture streams via Apache Kafka into a Spark Structured Streaming window for live intrusion alerting.
 3. **Unsupervised Anomaly Detection:** Deploy Spark MLlib Isolation Forests or Autoencoders for zero-day threat discovery.
+
+---
+
+## 🤝 Contributors
+* **[Gopal Prusty](https://github.com/prustygopal88-max)** - Project Contributor
+* **[Vivek Jaiswal](https://github.com/vivekkash2125-star)** - Project Contributor
+* **[Nidhi Chougule](https://github.com/nidhichougule)** - Project Contributor
+
