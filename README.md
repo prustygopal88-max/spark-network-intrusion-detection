@@ -203,66 +203,74 @@ Below are the visual previews of the enterprise NetGuard AI platform:
 ### 1. Platform Overview & 3-Step Explainable AI Workflow
 The main landing page explaining the platform purpose, live telemetry HUD status, and the 3-step intrusion detection workflow:
 
-![Dashboard Overview](screenshots/dashboard.png)
+<p align="center">
+  <img src="./screenshots/dashboard.png" alt="Dashboard Overview" width="100%" />
+</p>
 
 ---
 
 ### 2. Real-Time Connection Scanner & Reason-Based XAI Report
 Live single-flow testing with 1-click presets, threat score meter, and plain-English Explainable AI reasoning:
 
-![Single Flow Prediction and XAI Report](screenshots/single_prediction.png)
+<p align="center">
+  <img src="./screenshots/single_prediction.png" alt="Single Flow Prediction and XAI Report" width="100%" />
+</p>
 
 ---
 
 ### 3. Bulk Network Traffic Classifier (CSV Upload & Demo Mode)
 The bulk classifier interface supporting drag-and-drop CSV uploads or 1-click pre-packaged demo datasets:
 
-![Batch Traffic Classifier](screenshots/batch_prediction.png)
+<p align="center">
+  <img src="./screenshots/batch_prediction.png" alt="Batch Traffic Classifier" width="100%" />
+</p>
 
 ---
 
 ### 4. Bulk Classification Analytics & CSV Export
 Multi-threaded classification breakdown, benign vs. attack metrics, preview table, and downloadable reports:
 
-![Batch Classification Results](screenshots/batch_results.png)
+<p align="center">
+  <img src="./screenshots/batch_results.png" alt="Batch Classification Results" width="100%" />
+</p>
 
 ---
 
 ### 5. Security Operations Center (SOC) Admin Portal & Spark Telemetry
 The administrative console detailing Apache Spark cluster parameters, Big Data cleaning metrics, and MLlib benchmarks:
 
-![Admin SOC Console and Model Performance](screenshots/model_performance.png)
+<p align="center">
+  <img src="./screenshots/model_performance.png" alt="Admin SOC Console and Model Performance" width="100%" />
+</p>
 
 ---
 
-## 💡 How to Update Screenshots Manually in VS Code
+## 💡 How to View & Update Screenshots in VS Code
 
-If you capture updated screenshots from your browser (`http://localhost:8000`):
-
-1. Save your screenshots with the following filenames:
-   - `dashboard.png` (Landing page & Overview)
-   - `single_prediction.png` (Single connection scan with XAI report)
-   - `batch_prediction.png` (Batch CSV upload screen)
-   - `batch_results.png` (Batch results table & metrics)
-   - `model_performance.png` (Admin SOC portal view)
-2. Place them directly in the **`screenshots/`** directory in your project root.
-3. In VS Code, press **`Ctrl + Shift + V`** to preview this `README.md` with images rendered!
+### Why images might show broken in VS Code Preview & How to fix:
+1. **Open the Entire Project Folder (Not just the file):**
+   In VS Code, click **File → Open Folder...** and select `spark-network-intrusion-detection`. VS Code requires the root folder to be open so its webview has permission to read `./screenshots/`.
+2. **Reload Markdown Preview:**
+   Press **`Ctrl + Shift + V`** (or right-click `README.md` and select **Open Preview**).
+3. **Change Preview Security (If images are blocked by VS Code):**
+   - In the top-right corner of the Markdown Preview tab, click the **Security Shield / Lock** icon (or press `Ctrl + Shift + P` and search `Markdown: Change Preview Security Settings`).
+   - Select **Disable** (Allow insecure and local content).
 
 ---
 
-## 💻 Essential VS Code Commands
+## 💻 Essential VS Code & Command Prompt Instructions
 
-Here are the exact terminal commands and shortcuts to manage this project inside Visual Studio Code:
+Here are the exact terminal commands to run the app, preview changes, and upload/push everything to GitHub:
 
 ### 1. Open Project in VS Code
-Open your terminal (PowerShell / Command Prompt) and run:
-```powershell
+Open Command Prompt or PowerShell and run:
+```cmd
 cd c:\Users\prust\OneDrive\Desktop\spark-network-intrusion-detection
 code .
 ```
 
 ### 2. Open Integrated Terminal in VS Code
-- **Shortcut:** Press **`Ctrl + ~`** (Control + Tilde) to open the built-in terminal.
+- **Shortcut:** Press **`Ctrl + ~`** (Control + Tilde).
 
 ### 3. Run the Web Application
 Inside the VS Code integrated terminal:
@@ -275,7 +283,23 @@ Open **`http://localhost:8000`** in your browser.
 - Open `README.md` in VS Code.
 - Press **`Ctrl + Shift + V`** to open the side-by-side Markdown Live Preview.
 
-### 5. Run Automated Tests in VS Code
+### 5. Update README and Push to GitHub (VS Code Terminal)
+Run these commands inside the VS Code terminal to upload and update everything on GitHub:
+```powershell
+# Step 1: Check modified files
+git status
+
+# Step 2: Stage the updated README and screenshots
+git add README.md screenshots/
+
+# Step 3: Commit the changes
+git commit -m "docs: connect high-tech UI screenshots in README with explicit relative paths"
+
+# Step 4: Upload / Push to GitHub repository
+git push origin main
+```
+
+### 6. Run Automated Test Suite
 ```powershell
 python tests/test_end_to_end.py
 ```
