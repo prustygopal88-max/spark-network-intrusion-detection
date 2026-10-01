@@ -110,13 +110,13 @@ spark-network-intrusion-detection/
 │   ├── model_comparison.md
 │   ├── preprocessing_report.json   # Preprocessing diagnostic report
 │   ├── sample_presets.json         # Preset flows for 1-click testing
-│   └── FINAL_PROJECT_REPORT.md     # Full academic project report
-├── screenshots/                    # UI Screenshots for documentation
-│   ├── dashboard.png               # Main Overview & 3-Step Workflow
-│   ├── single_prediction.png       # Live Connection Scanner & XAI Report
-│   ├── batch_prediction.png        # Bulk Traffic Classifier & Upload Zone
-│   ├── batch_results.png           # Batch Results Preview Table & Download
-│   └── model_performance.png       # Admin SOC Console & Spark Telemetry
+├── assets/
+│   └── screenshots/                # UI Screenshots for documentation
+│       ├── dashboard.png           # Main Overview & 3-Step Workflow
+│       ├── single_prediction.png   # Live Connection Scanner & XAI Report
+│       ├── batch_prediction.png    # Bulk Traffic Classifier & Upload Zone
+│       ├── batch_results.png       # Batch Results Preview Table & Download
+│       └── model_performance.png   # Admin SOC Console & Spark Telemetry
 ├── src/
 │   ├── evaluation/
 │   │   ├── metrics.py              # Accuracy, Precision, Recall, F1, ROC-AUC, CM plots
@@ -203,55 +203,35 @@ Below are the visual previews of the enterprise NetGuard AI platform:
 ### 1. Platform Overview & 3-Step Explainable AI Workflow
 The main landing page explaining the platform purpose, live telemetry HUD status, and the 3-step intrusion detection workflow:
 
-<p align="center">
-  <a href="./screenshots/dashboard.png">
-    <img src="./screenshots/dashboard.png" alt="Dashboard Overview" width="100%" />
-  </a>
-</p>
+![Dashboard Overview](assets/screenshots/dashboard.png)
 
 ---
 
 ### 2. Real-Time Connection Scanner & Reason-Based XAI Report
 Live single-flow testing with 1-click presets, threat score meter, and plain-English Explainable AI reasoning:
 
-<p align="center">
-  <a href="./screenshots/single_prediction.png">
-    <img src="./screenshots/single_prediction.png" alt="Single Flow Prediction and XAI Report" width="100%" />
-  </a>
-</p>
+![Single Flow Prediction and XAI Report](assets/screenshots/single_prediction.png)
 
 ---
 
 ### 3. Bulk Network Traffic Classifier (CSV Upload & Demo Mode)
 The bulk classifier interface supporting drag-and-drop CSV uploads or 1-click pre-packaged demo datasets:
 
-<p align="center">
-  <a href="./screenshots/batch_prediction.png">
-    <img src="./screenshots/batch_prediction.png" alt="Batch Traffic Classifier" width="100%" />
-  </a>
-</p>
+![Batch Traffic Classifier](assets/screenshots/batch_prediction.png)
 
 ---
 
 ### 4. Bulk Classification Analytics & CSV Export
 Multi-threaded classification breakdown, benign vs. attack metrics, preview table, and downloadable reports:
 
-<p align="center">
-  <a href="./screenshots/batch_results.png">
-    <img src="./screenshots/batch_results.png" alt="Batch Classification Results" width="100%" />
-  </a>
-</p>
+![Batch Classification Results](assets/screenshots/batch_results.png)
 
 ---
 
 ### 5. Security Operations Center (SOC) Admin Portal & Spark Telemetry
 The administrative console detailing Apache Spark cluster parameters, Big Data cleaning metrics, and MLlib benchmarks:
 
-<p align="center">
-  <a href="./screenshots/model_performance.png">
-    <img src="./screenshots/model_performance.png" alt="Admin SOC Console and Model Performance" width="100%" />
-  </a>
-</p>
+![Admin SOC Console and Model Performance](assets/screenshots/model_performance.png)
 
 ---
 
@@ -299,14 +279,14 @@ Run these commands inside the VS Code terminal to upload and update everything o
 # Step 1: Check modified files
 git status
 
-# Step 2: Stage the updated README and screenshots
-git add README.md screenshots/
+# Step 2: Stage the updated README and new assets folder
+git add README.md assets/
 
 # Step 3: Commit the changes
-git commit -m "docs: connect high-tech UI screenshots in README with explicit relative paths"
+git commit -m "docs: connect new assets/screenshots folder in README"
 
 # Step 4: Upload / Push to GitHub repository
-git push origin main
+git push origin main --force
 ```
 
 ### 6. Run Automated Test Suite
