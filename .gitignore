@@ -35,3 +35,6 @@ hadoop/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Temporary prediction output
+results/last_batch_prediction.csv
