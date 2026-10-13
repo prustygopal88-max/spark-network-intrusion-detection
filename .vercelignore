@@ -1,0 +1,14 @@
+# Vercel deployment exclusions
+data/raw/
+hadoop/
+notebooks/
+tests/
+results/models/random_forest_model/
+results/models/gbt_model/
+results/models/logistic_regression_model/
+results/models/feature_pipeline_model/
+.git/
+.venv/
+venv/
+__pycache__/
+*.parquet
