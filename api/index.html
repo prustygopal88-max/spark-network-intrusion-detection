@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetGuard AI - Scalable Network Intrusion Detection</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            cyber: {
+              dark: '#080C15',
+              card: '#0F172A',
+              border: '#1E293B',
+              primary: '#06B6D4',
+              secondary: '#6366F1',
+              success: '#10B981',
+              danger: '#EF4444',
+              warning: '#F59E0B',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #080C15;
+      color: #E2E8F0;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      transition: all 0.2s ease-in-out;
+    }
+    .glass-card:hover {
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+    .pulse-dot {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 50%, #8B5CF6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .attack-glow {
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.25);
+      border-color: #EF4444 !important;
+    }
+    .benign-glow {
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+      border-color: #10B981 !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP HUD NAVIGATION -->
+  <header class="border-b border-cyber-border bg-cyber-card/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">
+          🛡️
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-extrabold text-lg tracking-tight text-white">NetGuard <span class="gradient-text">AI</span></span>
+            <span class="px-2 py-0.5 text-xs font-mono bg-cyan-950 text-cyan-400 border border-cyan-800 rounded-full">Spark MLlib</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Scalable Network Intrusion & Anomaly Analysis</p>
+        </div>
+      </div>
+
+      <!-- SYSTEM STATUS BADGES -->
+      <div class="hidden md:flex items-center space-x-4 text-xs font-mono text-slate-300">
+        <div class="flex items-center space-x-1.5 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+          <span>Engine: <strong class="text-white">Spark 3.5.9</strong></span>
+        </div>
+        <div class="flex items-center space-x-1.5 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
+          <span>JVM: <strong class="text-white">OpenJDK 17 LTS</strong></span>
+        </div>
+        <div class="flex items-center space-x-1.5 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
+          <span>Top Accuracy: <strong class="text-emerald-400">99.99%</strong></span>
+        </div>
+      </div>
+
+      <!-- PORTAL SWITCHER BUTTON -->
+      <div class="flex items-center space-x-2 bg-slate-900 p-1 rounded-lg border border-slate-800">
+        <button id="btn-user-mode" onclick="switchPortal('user')" class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all bg-cyan-600 text-white shadow">
+          👤 User Demo
+        </button>
+        <button id="btn-admin-mode" onclick="switchPortal('admin')" class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-white">
+          🛡️ Admin SOC
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ================================================================= -->
+    <!-- PORTAL A: USER / PUBLIC LIVE DEMO (NON-TECHNICAL & EXPLAINABLE AI) -->
+    <!-- ================================================================= -->
+    <div id="portal-user" class="space-y-6">
+
+      <!-- HERO BANNER -->
+      <div class="glass-card p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-950/40 relative overflow-hidden">
+        <div class="max-w-3xl">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 mb-3">
+            <span>✨ Explainable AI (XAI) Architecture</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
+            Real-Time Network Threat & Anomaly Scanner
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Our Apache Spark AI acts as an autonomous digital firewall that inspects thousands of network connections in real time. It catches hackers probing company systems (PortScan attacks) and explains in plain English <b>why</b> traffic was flagged.
+          </p>
+        </div>
+      </div>
+
+      <!-- 3-STEP EXPLAINER ACCORDION / STEPS -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="glass-card p-5 border-l-4 border-l-cyan-500">
+          <div class="text-xs font-mono text-cyan-400 font-bold mb-1">STEP 01</div>
+          <h4 class="font-bold text-white text-base mb-1">Capture Flow Telemetry</h4>
+          <p class="text-xs text-slate-400 leading-normal">Inspects connection duration, packet sizes, transfer rates, and targeted ports without reading private data.</p>
+        </div>
+        <div class="glass-card p-5 border-l-4 border-l-indigo-500">
+          <div class="text-xs font-mono text-indigo-400 font-bold mb-1">STEP 02</div>
+          <h4 class="font-bold text-white text-base mb-1">Distributed Spark AI</h4>
+          <p class="text-xs text-slate-400 leading-normal">Apache Spark MLlib evaluates 68 behavioral safety indicators across millions of records in milliseconds.</p>
+        </div>
+        <div class="glass-card p-5 border-l-4 border-l-emerald-500">
+          <div class="text-xs font-mono text-emerald-400 font-bold mb-1">STEP 03</div>
+          <h4 class="font-bold text-white text-base mb-1">Reason-Based XAI Report</h4>
+          <p class="text-xs text-slate-400 leading-normal">Translates mathematical vectors into plain-English reasoning showing why the connection is safe or dangerous.</p>
+        </div>
+      </div>
+
+      <!-- SUB-NAVIGATION TABS (SINGLE vs BATCH) -->
+      <div class="flex border-b border-cyber-border space-x-6">
+        <button id="tab-single-btn" onclick="switchUserTab('single')" class="pb-3 text-sm font-semibold border-b-2 border-cyan-500 text-cyan-400 transition-colors">
+          🎯 Live Connection Scanner (Single Flow)
+        </button>
+        <button id="tab-batch-btn" onclick="switchUserTab('batch')" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition-colors">
+          📁 Bulk Traffic Classifier (Batch CSV)
+        </button>
+      </div>
+
+      <!-- TAB 1: SINGLE FLOW PREDICTION + XAI -->
+      <div id="user-single-view" class="space-y-6">
+
+        <!-- PRESET CONTROLS & QUICK ACTIONS -->
+        <div class="glass-card p-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+            <div>
+              <h3 class="font-bold text-white text-lg">🧪 1-Click Interactive Presets</h3>
+              <p class="text-xs text-slate-400">Load authentic flow telemetry captured during normal operations or active reconnaissance attacks:</p>
+            </div>
+            <div class="flex items-center space-x-3 w-full sm:w-auto">
+              <button onclick="loadPreset('BENIGN')" class="flex-1 sm:flex-none px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2">
+                <span>🟢 Load Safe Browsing</span>
+              </button>
+              <button onclick="loadPreset('PORTSCAN')" class="flex-1 sm:flex-none px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/40 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2">
+                <span>🔴 Load PortScan Attack</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TELEMETRY INPUT CONTROLS -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Target Port (destination_port)</label>
+              <input type="number" id="inp-dest-port" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-cyan-500 focus:outline-none" value="80">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Connection Duration (µs)</label>
+              <input type="number" id="inp-duration" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-cyan-500 focus:outline-none" value="1266342">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Packets Sent (total_fwd_packets)</label>
+              <input type="number" id="inp-fwd-pkts" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-cyan-500 focus:outline-none" value="41">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Packets Received (total_bwd_packets)</label>
+              <input type="number" id="inp-bwd-pkts" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-cyan-500 focus:outline-none" value="44">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Average Packet Size (bytes)</label>
+              <input type="number" id="inp-pkt-len" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-cyan-500 focus:outline-none" value="65.0">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Transfer Rate (flow_bytes_s)</label>
+              <input type="number" id="inp-bytes-rate" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-cyan-500 focus:outline-none" value="4320.0">
+            </div>
+          </div>
+
+          <!-- SCAN BUTTON -->
+          <div class="mt-5">
+            <button id="btn-run-scan" onclick="runSingleScan()" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg font-bold text-sm tracking-wide shadow-lg shadow-cyan-600/20 transition flex items-center justify-center space-x-2">
+              <span>⚡ INITIATE SPARK AI THREAT SCAN</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- REAL-TIME SCAN VERDICT & XAI REPORT -->
+        <div id="scan-result-card" class="glass-card p-6 hidden">
+          <!-- Dynamic Verdict Header -->
+          <div id="verdict-banner" class="p-4 rounded-lg font-extrabold text-lg sm:text-xl text-center mb-6"></div>
+
+          <!-- Two Column Results (Metrics & Gauge) -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- COLUMN 1: PROBABILITY & GAUGE -->
+            <div class="glass-card p-5 bg-slate-900/60 border border-slate-800 flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-mono text-slate-400 uppercase tracking-wider">Detection Confidence</span>
+                <div class="text-3xl font-extrabold text-white mt-1" id="res-confidence">--%</div>
+                <div class="text-xs text-slate-400 mt-1" id="res-model-name">Engine: Random Forest</div>
+              </div>
+              <div class="my-4">
+                <div class="flex justify-between text-xs font-mono mb-1">
+                  <span class="text-rose-400">PortScan Threat Score:</span>
+                  <span class="text-rose-400 font-bold" id="res-threat-score">0.0%</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                  <div id="res-threat-bar" class="bg-rose-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+              </div>
+              <div class="text-xs text-slate-400 bg-slate-800/40 p-2.5 rounded border border-slate-700/50" id="res-action">
+                🛡️ Recommended Action: Evaluating...
+              </div>
+            </div>
+
+            <!-- COLUMN 2 & 3: EXPLAINABLE AI REASONING -->
+            <div class="lg:col-span-2 glass-card p-5 bg-slate-900/60 border border-slate-800">
+              <div class="flex items-center space-x-2 mb-2">
+                <span class="text-base font-bold text-white">🧠 Explainable AI (XAI) Reason-Based Breakdown</span>
+                <span class="px-2 py-0.5 text-xs bg-indigo-900/60 text-indigo-300 rounded font-mono">Plain English</span>
+              </div>
+              <p class="text-slate-300 text-sm leading-relaxed mb-4" id="xai-summary"></p>
+              
+              <h5 class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-2 font-bold">Key Architectural Indicators Identified:</h5>
+              <ul class="space-y-2 text-xs text-slate-300" id="xai-reasons-list"></ul>
+            </div>
+          </div>
+
+          <!-- RISK FACTOR TELEMETRY TABLE -->
+          <div class="mt-6">
+            <h5 class="text-xs font-mono text-slate-400 uppercase tracking-wider mb-2 font-bold">Detailed Telemetry Safety Indicators:</h5>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs font-mono">
+                <thead class="bg-slate-900 text-slate-400 border-b border-slate-800">
+                  <tr>
+                    <th class="py-2.5 px-3">Telemetry Factor</th>
+                    <th class="py-2.5 px-3">Measured Value</th>
+                    <th class="py-2.5 px-3">Status Analysis</th>
+                    <th class="py-2.5 px-3">Risk Level</th>
+                  </tr>
+                </thead>
+                <tbody id="xai-factors-table" class="divide-y divide-slate-800 text-slate-300"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: BATCH CSV SCANNER -->
+      <div id="user-batch-view" class="space-y-6 hidden">
+        <div class="glass-card p-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+            <div>
+              <h3 class="font-bold text-white text-lg">📁 Bulk Network Traffic Classifier</h3>
+              <p class="text-xs text-slate-400">Classify an entire packet flow capture log containing hundreds of connections in parallel using Spark MLlib:</p>
+            </div>
+            <button onclick="runBatchDemo()" class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-cyan-600/20">
+              🧪 1-Click Load 1,000-Flow Demo Dataset
+            </button>
+          </div>
+
+          <div class="border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-xl p-8 text-center transition cursor-pointer bg-slate-900/40" onclick="document.getElementById('batch-file-input').click()">
+            <input type="file" id="batch-file-input" class="hidden" accept=".csv" onchange="handleFileUpload(event)">
+            <div class="text-3xl mb-2">📤</div>
+            <div class="font-bold text-white text-sm">Upload Network Capture CSV</div>
+            <p class="text-xs text-slate-400 mt-1">Supports raw or preprocessed CICIDS2017 flow exports</p>
+          </div>
+
+          <!-- BATCH RESULTS DISPLAY -->
+          <div id="batch-results-container" class="mt-6 hidden space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div class="glass-card p-4 text-center">
+                <span class="text-xs text-slate-400 font-mono">Total Flows Analyzed</span>
+                <div class="text-2xl font-bold text-white mt-1" id="bm-total">0</div>
+              </div>
+              <div class="glass-card p-4 text-center border-l-4 border-l-emerald-500">
+                <span class="text-xs text-emerald-400 font-mono">Normal Safe (BENIGN)</span>
+                <div class="text-2xl font-bold text-emerald-400 mt-1" id="bm-benign">0</div>
+              </div>
+              <div class="glass-card p-4 text-center border-l-4 border-l-rose-500">
+                <span class="text-xs text-rose-400 font-mono">Malicious Probes (PortScan)</span>
+                <div class="text-2xl font-bold text-rose-400 mt-1" id="bm-portscan">0</div>
+              </div>
+              <div class="glass-card p-4 text-center">
+                <span class="text-xs text-cyan-400 font-mono">Spark Model</span>
+                <div class="text-xl font-bold text-cyan-400 mt-1">Random Forest</div>
+              </div>
+            </div>
+
+            <!-- BATCH PREVIEW TABLE -->
+            <div class="glass-card p-5">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="font-bold text-white text-sm">Classification Telemetry Preview (Top 100 Flows):</h4>
+                <a href="/api/download-batch-results" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-bold transition flex items-center space-x-1">
+                  <span>💾 Download Classified CSV</span>
+                </a>
+              </div>
+              <div class="overflow-x-auto max-h-80">
+                <table class="w-full text-left text-xs font-mono">
+                  <thead class="bg-slate-900 text-slate-400 sticky top-0 border-b border-slate-800">
+                    <tr>
+                      <th class="py-2 px-3">Verdict</th>
+                      <th class="py-2 px-3">Threat Score</th>
+                      <th class="py-2 px-3">Confidence</th>
+                      <th class="py-2 px-3">Target Port</th>
+                      <th class="py-2 px-3">Duration (µs)</th>
+                      <th class="py-2 px-3">Fwd Packets</th>
+                    </tr>
+                  </thead>
+                  <tbody id="batch-preview-tbody" class="divide-y divide-slate-800 text-slate-300"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- PORTAL B: ADMIN & SECURITY OPERATIONS CENTER (DEEP TELEMETRY) -->
+    <!-- ================================================================= -->
+    <div id="portal-admin" class="space-y-6 hidden">
+
+      <!-- ADMIN HERO BANNER -->
+      <div class="glass-card p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-indigo-500/30">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 mb-3">
+              <span>🛡️ Security Operations Center (SOC) Master Console</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Apache Spark & MLlib Engineering Dashboard
+            </h1>
+            <p class="text-slate-300 text-sm mt-1">
+              Distributed cluster specifications, data engineering hygiene, and multi-model benchmark matrices.
+            </p>
+          </div>
+          <div class="px-4 py-2 bg-indigo-900/40 border border-indigo-700/50 rounded-lg text-xs font-mono text-indigo-300">
+            Node: 127.0.0.1 (Localhost)
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN METRICS TABS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass-card p-4">
+          <span class="text-xs font-mono text-slate-400">Raw Telemetry Rows</span>
+          <div class="text-2xl font-bold text-white mt-1">286,467</div>
+          <div class="text-xs text-slate-400 mt-1">CICIDS2017 Dataset</div>
+        </div>
+        <div class="glass-card p-4 border-l-4 border-l-cyan-500">
+          <span class="text-xs font-mono text-cyan-400">Cleaned Usable Records</span>
+          <div class="text-2xl font-bold text-cyan-400 mt-1">213,777</div>
+          <div class="text-xs text-slate-400 mt-1">Deduplicated & Sanitized</div>
+        </div>
+        <div class="glass-card p-4 border-l-4 border-l-amber-500">
+          <span class="text-xs font-mono text-amber-400">Duplicates Filtered</span>
+          <div class="text-2xl font-bold text-amber-400 mt-1">72,353</div>
+          <div class="text-xs text-slate-400 mt-1">25.26% Redundant Flows</div>
+        </div>
+        <div class="glass-card p-4 border-l-4 border-l-emerald-500">
+          <span class="text-xs font-mono text-emerald-400">Retained Features</span>
+          <div class="text-2xl font-bold text-emerald-400 mt-1">68 Features</div>
+          <div class="text-xs text-slate-400 mt-1">10 Constant Cols Dropped</div>
+        </div>
+      </div>
+
+      <!-- MODEL BENCHMARK TABLE -->
+      <div class="glass-card p-6">
+        <h3 class="font-bold text-white text-base mb-1">📈 Multi-Model PySpark MLlib Benchmark</h3>
+        <p class="text-xs text-slate-400 mb-4">Evaluated across <b>42,582</b> held-out test network flow records:</p>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-slate-900 text-slate-400 border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-3">Classifier</th>
+                <th class="py-3 px-3">Accuracy</th>
+                <th class="py-3 px-3">Precision</th>
+                <th class="py-3 px-3">Recall</th>
+                <th class="py-3 px-3">F1-Score</th>
+                <th class="py-3 px-3">ROC-AUC</th>
+                <th class="py-3 px-3">Train Latency</th>
+                <th class="py-3 px-3">False Alarms (FP)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-300">
+              <tr class="bg-emerald-950/20 font-bold text-emerald-300">
+                <td class="py-3 px-3 flex items-center space-x-1.5">
+                  <span>⭐ Random Forest</span>
+                </td>
+                <td class="py-3 px-3 text-emerald-400">99.99%</td>
+                <td class="py-3 px-3 text-emerald-400">100.00%</td>
+                <td class="py-3 px-3">99.98%</td>
+                <td class="py-3 px-3 text-emerald-400">99.99%</td>
+                <td class="py-3 px-3">1.0000</td>
+                <td class="py-3 px-3">7.01s</td>
+                <td class="py-3 px-3 text-emerald-400">0 (0.0%)</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-3">Gradient-Boosted Trees</td>
+                <td class="py-3 px-3">99.96%</td>
+                <td class="py-3 px-3">99.95%</td>
+                <td class="py-3 px-3">99.96%</td>
+                <td class="py-3 px-3">99.95%</td>
+                <td class="py-3 px-3">0.9999</td>
+                <td class="py-3 px-3">31.66s</td>
+                <td class="py-3 px-3">10</td>
+              </tr>
+              <tr>
+                <td class="py-3 px-3">Logistic Regression</td>
+                <td class="py-3 px-3">99.00%</td>
+                <td class="py-3 px-3">98.35%</td>
+                <td class="py-3 px-3">99.34%</td>
+                <td class="py-3 px-3">98.84%</td>
+                <td class="py-3 px-3">0.9975</td>
+                <td class="py-3 px-3">11.94s</td>
+                <td class="py-3 px-3">304</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CONFUSION MATRIX VISUALIZER -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass-card p-6">
+          <h4 class="font-bold text-white text-base mb-1">🎯 Random Forest Confusion Matrix</h4>
+          <p class="text-xs text-slate-400 mb-4">42,582 independent test flow classifications:</p>
+          <div class="grid grid-cols-2 gap-3 text-center font-mono">
+            <div class="p-4 bg-emerald-950/40 border border-emerald-800 rounded-lg">
+              <span class="text-xs text-emerald-300">True Negatives (Safe Traffic)</span>
+              <div class="text-2xl font-bold text-white mt-1">24,334</div>
+              <span class="text-[10px] text-emerald-400">Correctly Verified Normal</span>
+            </div>
+            <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg">
+              <span class="text-xs text-slate-400">False Positives (False Alarms)</span>
+              <div class="text-2xl font-bold text-emerald-400 mt-1">0</div>
+              <span class="text-[10px] text-emerald-400">Zero False Alarms!</span>
+            </div>
+            <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg">
+              <span class="text-xs text-slate-400">False Negatives (Missed)</span>
+              <div class="text-2xl font-bold text-amber-400 mt-1">4</div>
+              <span class="text-[10px] text-slate-400">0.02% Miss Rate</span>
+            </div>
+            <div class="p-4 bg-rose-950/40 border border-rose-800 rounded-lg">
+              <span class="text-xs text-rose-300">True Positives (PortScan)</span>
+              <div class="text-2xl font-bold text-white mt-1">18,244</div>
+              <span class="text-[10px] text-rose-400">Correctly Intercepted</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6">
+          <h4 class="font-bold text-white text-base mb-1">🛠️ PySpark MLlib Pipeline DAG</h4>
+          <p class="text-xs text-slate-400 mb-4">Feature engineering & transformation workflow:</p>
+          <div class="bg-slate-950 p-4 rounded-lg font-mono text-xs text-slate-300 leading-relaxed border border-slate-800">
+            <p class="text-cyan-400 font-bold mb-1">1. Ingestion: Raw CICIDS2017 (286,467 rows)</p>
+            <p class="text-slate-400 pl-4">└── cleaner.py (Deduplication + Sanitize Inf/NaN)</p>
+            <p class="text-cyan-400 font-bold mt-2 mb-1">2. Train/Test Split (seed=42)</p>
+            <p class="text-slate-400 pl-4">├── Train: 171,195 rows (80%)</p>
+            <p class="text-slate-400 pl-4">└── Test: 42,582 rows (20%)</p>
+            <p class="text-cyan-400 font-bold mt-2 mb-1">3. Feature Transformation Pipeline</p>
+            <p class="text-slate-400 pl-4">├── VectorAssembler(68 numeric cols -> raw_features)</p>
+            <p class="text-slate-400 pl-4">└── StandardScaler(raw_features -> features, withStd=True)</p>
+            <p class="text-cyan-400 font-bold mt-2 mb-1">4. Model Estimators</p>
+            <p class="text-emerald-400 pl-4 font-bold">└── RandomForestClassifier(numTrees=30, maxDepth=10)</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    let currentPresets = {};
+    let activePreset = {};
+
+    // Load presets on init
+    async function init() {
+      try {
+        const res = await fetch('/api/presets');
+        currentPresets = await res.json();
+        if (currentPresets.BENIGN) {
+          activePreset = currentPresets.BENIGN;
+        }
+      } catch (err) {
+        console.error("Error loading presets:", err);
+      }
+    }
+    init();
+
+    // Portal Switcher
+    function switchPortal(mode) {
+      const userPortal = document.getElementById('portal-user');
+      const adminPortal = document.getElementById('portal-admin');
+      const btnUser = document.getElementById('btn-user-mode');
+      const btnAdmin = document.getElementById('btn-admin-mode');
+
+      if (mode === 'admin') {
+        userPortal.classList.add('hidden');
+        adminPortal.classList.remove('hidden');
+        btnAdmin.className = "px-3 py-1.5 text-xs font-semibold rounded-md transition-all bg-indigo-600 text-white shadow";
+        btnUser.className = "px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-white";
+      } else {
+        adminPortal.classList.add('hidden');
+        userPortal.classList.remove('hidden');
+        btnUser.className = "px-3 py-1.5 text-xs font-semibold rounded-md transition-all bg-cyan-600 text-white shadow";
+        btnAdmin.className = "px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-slate-400 hover:text-white";
+      }
+    }
+
+    // User Sub-Tabs Switcher
+    function switchUserTab(tab) {
+      const sView = document.getElementById('user-single-view');
+      const bView = document.getElementById('user-batch-view');
+      const sBtn = document.getElementById('tab-single-btn');
+      const bBtn = document.getElementById('tab-batch-btn');
+
+      if (tab === 'batch') {
+        sView.classList.add('hidden');
+        bView.classList.remove('hidden');
+        bBtn.className = "pb-3 text-sm font-semibold border-b-2 border-cyan-500 text-cyan-400 transition-colors";
+        sBtn.className = "pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition-colors";
+      } else {
+        bView.classList.add('hidden');
+        sView.classList.remove('hidden');
+        sBtn.className = "pb-3 text-sm font-semibold border-b-2 border-cyan-500 text-cyan-400 transition-colors";
+        bBtn.className = "pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white transition-colors";
+      }
+    }
+
+    // Load Presets into Inputs
+    function loadPreset(key) {
+      if (!currentPresets[key]) return;
+      activePreset = currentPresets[key];
+
+      document.getElementById('inp-dest-port').value = activePreset.destination_port || 80;
+      document.getElementById('inp-duration').value = activePreset.flow_duration || 1000000;
+      document.getElementById('inp-fwd-pkts').value = activePreset.total_fwd_packets || 5;
+      document.getElementById('inp-bwd-pkts').value = activePreset.total_backward_packets || 4;
+      document.getElementById('inp-pkt-len').value = activePreset.packet_length_mean || 100;
+      document.getElementById('inp-bytes-rate').value = activePreset.flow_bytes_s || 2500;
+    }
+
+    // Run Single Scan via FastAPI REST endpoint
+    async function runSingleScan() {
+      const scanBtn = document.getElementById('btn-run-scan');
+      scanBtn.innerHTML = '<span>⏳ ANALYZING TELEMETRY WITH PYSPARK...</span>';
+      scanBtn.disabled = true;
+
+      const payload = {
+        destination_port: parseFloat(document.getElementById('inp-dest-port').value),
+        flow_duration: parseFloat(document.getElementById('inp-duration').value),
+        total_fwd_packets: parseFloat(document.getElementById('inp-fwd-pkts').value),
+        total_backward_packets: parseFloat(document.getElementById('inp-bwd-pkts').value),
+        packet_length_mean: parseFloat(document.getElementById('inp-pkt-len').value),
+        flow_bytes_s: parseFloat(document.getElementById('inp-bytes-rate').value),
+        ...activePreset
+      };
+
+      // update modified attributes
+      payload.destination_port = parseFloat(document.getElementById('inp-dest-port').value);
+      payload.flow_duration = parseFloat(document.getElementById('inp-duration').value);
+      payload.total_fwd_packets = parseFloat(document.getElementById('inp-fwd-pkts').value);
+      payload.total_backward_packets = parseFloat(document.getElementById('inp-bwd-pkts').value);
+      payload.packet_length_mean = parseFloat(document.getElementById('inp-pkt-len').value);
+      payload.flow_bytes_s = parseFloat(document.getElementById('inp-bytes-rate').value);
+
+      try {
+        const res = await fetch('/api/predict/single', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({features: payload, model_name: 'Random Forest'})
+        });
+        const data = await res.json();
+        displayScanResults(data);
+      } catch (err) {
+        alert("Scan Error: " + err);
+      } finally {
+        scanBtn.innerHTML = '<span>⚡ INITIATE SPARK AI THREAT SCAN</span>';
+        scanBtn.disabled = false;
+      }
+    }
+
+    // Display Scan Results
+    function displayScanResults(data) {
+      const card = document.getElementById('scan-result-card');
+      card.classList.remove('hidden');
+
+      const isAttack = data.prediction.prediction_label === 'PORTSCAN';
+      const banner = document.getElementById('verdict-banner');
+
+      if (isAttack) {
+        banner.className = "p-4 rounded-lg font-extrabold text-lg sm:text-xl text-center mb-6 bg-gradient-to-r from-rose-700 to-red-600 text-white shadow-lg shadow-rose-900/30";
+        banner.innerHTML = "🚨 CRITICAL INTRUSION DETECTED: MALICIOUS PORT SCAN";
+        card.classList.add('attack-glow');
+        card.classList.remove('benign-glow');
+      } else {
+        banner.className = "p-4 rounded-lg font-extrabold text-lg sm:text-xl text-center mb-6 bg-gradient-to-r from-emerald-700 to-green-600 text-white shadow-lg shadow-emerald-900/30";
+        banner.innerHTML = "✅ VERIFIED SAFE: NORMAL NETWORK TRAFFIC (BENIGN)";
+        card.classList.add('benign-glow');
+        card.classList.remove('attack-glow');
+      }
+
+      document.getElementById('res-confidence').innerText = (data.prediction.confidence * 100).toFixed(2) + "%";
+      document.getElementById('res-threat-score').innerText = (data.prediction.portscan_prob * 100).toFixed(2) + "%";
+      document.getElementById('res-threat-bar').style.width = (data.prediction.portscan_prob * 100) + "%";
+      document.getElementById('res-action').innerText = "🛡️ " + data.xai.recommended_action;
+
+      document.getElementById('xai-summary').innerText = data.xai.layman_summary;
+
+      // Render XAI reasons
+      const reasonsList = document.getElementById('xai-reasons-list');
+      reasonsList.innerHTML = '';
+      data.xai.reasons.forEach(r => {
+        const li = document.createElement('li');
+        li.className = "flex items-start space-x-2";
+        li.innerHTML = `<span class="text-cyan-400 font-bold mt-0.5">•</span><span>${r}</span>`;
+        reasonsList.appendChild(li);
+      });
+
+      // Render factors table
+      const fTable = document.getElementById('xai-factors-table');
+      fTable.innerHTML = '';
+      data.xai.risk_factors.forEach(f => {
+        const tr = document.createElement('tr');
+        const badgeColor = f.risk === 'High' ? 'text-rose-400 bg-rose-950/60 border-rose-800' : 'text-emerald-400 bg-emerald-950/60 border-emerald-800';
+        tr.innerHTML = `
+          <td class="py-2.5 px-3 font-semibold text-white">${f.factor}</td>
+          <td class="py-2.5 px-3">${f.value}</td>
+          <td class="py-2.5 px-3">${f.status}</td>
+          <td class="py-2.5 px-3"><span class="px-2 py-0.5 border rounded text-[10px] ${badgeColor}">${f.risk} Risk</span></td>
+        `;
+        fTable.appendChild(tr);
+      });
+
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Run Batch Demo
+    async function runBatchDemo() {
+      const formData = new FormData();
+      formData.append('use_demo', 'true');
+      runBatchRequest(formData);
+    }
+
+    // Handle Upload File
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('file', file);
+      runBatchRequest(formData);
+    }
+
+    async function runBatchRequest(formData) {
+      try {
+        const res = await fetch('/api/predict/batch', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        displayBatchResults(data);
+      } catch (err) {
+        alert("Batch error: " + err);
+      }
+    }
+
+    function displayBatchResults(data) {
+      document.getElementById('batch-results-container').classList.remove('hidden');
+      document.getElementById('bm-total').innerText = data.summary.total_analyzed.toLocaleString();
+      document.getElementById('bm-benign').innerText = data.summary.benign_count.toLocaleString() + ` (${data.summary.benign_pct}%)`;
+      document.getElementById('bm-portscan').innerText = data.summary.portscan_count.toLocaleString() + ` (${data.summary.portscan_pct}%)`;
+
+      const tbody = document.getElementById('batch-preview-tbody');
+      tbody.innerHTML = '';
+      data.preview.forEach(row => {
+        const tr = document.createElement('tr');
+        const isAttack = row.Predicted_Class === 'PORTSCAN';
+        const badge = isAttack ? '<span class="px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">PORTSCAN</span>' : '<span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">BENIGN</span>';
+        tr.innerHTML = `
+          <td class="py-2 px-3">${badge}</td>
+          <td class="py-2 px-3">${row['Threat_Score (%)']}%</td>
+          <td class="py-2 px-3">${row['Confidence (%)']}%</td>
+          <td class="py-2 px-3">${row.destination_port || '--'}</td>
+          <td class="py-2 px-3">${row.flow_duration || '--'}</td>
+          <td class="py-2 px-3">${row.total_fwd_packets || '--'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>

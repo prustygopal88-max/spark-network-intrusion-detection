@@ -287,9 +287,22 @@ def download_batch_results():
 
 # High-Tech Cyber Web Dashboard HTML
 @app.get("/", response_class=HTMLResponse)
+@app.get("/api", response_class=HTMLResponse)
 @app.get("/api/index", response_class=HTMLResponse)
-def serve_dashboard():
-    if os.path.exists(HTML_FILE):
-        with open(HTML_FILE, "r", encoding="utf-8") as f:
-            return f.read()
+@app.get("/api/index.py", response_class=HTMLResponse)
+@app.get("/{full_path:path}", response_class=HTMLResponse)
+def serve_dashboard(full_path: str = ""):
+    if full_path in ["api/presets", "api/metadata", "api/predict/single", "api/predict/batch", "api/download-batch-results"]:
+        raise HTTPException(status_code=404, detail=f"API endpoint /{full_path} not found")
+
+    candidate_paths = [
+        HTML_FILE,
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "index.html"),
+    ]
+    for p in candidate_paths:
+        if os.path.exists(p):
+            with open(p, "r", encoding="utf-8") as f:
+                return f.read()
     return "<h1>NetGuard AI Server Running. Template not found.</h1>"
+
