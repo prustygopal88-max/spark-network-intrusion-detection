@@ -1,12 +1,17 @@
-# Vercel deployment exclusions
+# Vercel deployment exclusions (keeps function bundle < 15MB)
 data/raw/
 hadoop/
 notebooks/
 tests/
+screenshots/
+assets/
+docs/
 results/models/random_forest_model/
 results/models/gbt_model/
 results/models/logistic_regression_model/
 results/models/feature_pipeline_model/
+results/models/lightweight/*.pkl
+results/figures/
 .git/
 .venv/
 venv/
