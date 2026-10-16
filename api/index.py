@@ -287,6 +287,7 @@ def download_batch_results():
 
 # High-Tech Cyber Web Dashboard HTML
 @app.get("/", response_class=HTMLResponse)
+@app.get("/api/index", response_class=HTMLResponse)
 def serve_dashboard():
     if os.path.exists(HTML_FILE):
         with open(HTML_FILE, "r", encoding="utf-8") as f:

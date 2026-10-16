@@ -16,4 +16,6 @@ results/figures/
 .venv/
 venv/
 __pycache__/
+app/server.py
+app/app.py
 *.parquet
